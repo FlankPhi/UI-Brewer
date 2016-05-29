@@ -184,5 +184,6 @@
 				<Run Foreground="White" Text="{Binding Temp}"/>
                 <Run Text="C"/><LineBreak/>
         </TextBlock>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Margin="697,838,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top"/>
     </Grid>
 </Page>

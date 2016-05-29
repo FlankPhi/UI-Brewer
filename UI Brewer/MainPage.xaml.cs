@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using UI_Brewer.SimulatedData;
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -69,17 +69,31 @@ namespace UI_Brewer
     }
     public class ViewModel : System.ComponentModel.INotifyPropertyChanged
     {
-
+        private Simulator simData;
+        private Windows.UI.Xaml.DispatcherTimer timer;
         public ViewModel()
         {
             if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
-            {
+            { 
                 PowerA = 180;
                 TempA = 180;
                 SetTempA = 180;
             }
-        }
 
+            simData = new Simulator(0);
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(100);
+            timer.Tick += updateTemp;
+            timer.Start();
+
+        }
+        private void updateTemp(object sender, object e)
+        {
+            Temp = (int) Math.Round(simData.getCurTemp());
+            TempA = simData.getCurTemp() * 3.4;
+            Power = (int)Math.Round(simData.getPower());
+            PowerA = simData.getPower() * 3.4;
+        }
         #region Dials
 
         #region Angels & Values
@@ -91,7 +105,7 @@ namespace UI_Brewer
             set
             {
                 SetProperty(ref m_powerA, value);
-                Power = (int)(value / 3.4d);
+                Power = (int)Math.Round((value / 3.4d));
             }
         }
 
@@ -106,11 +120,16 @@ namespace UI_Brewer
             set
             {
                 SetProperty(ref m_tempA, value);
-                Temp = (int)(value / 3.4d);
+                Temp = (int)Math.Round((value / 3.4d));
             }
         }
         int m_temp = default(int);
-        public int Temp { get { return m_temp; } private set { SetProperty(ref m_temp, value); } }
+        public int Temp {
+            get { return m_temp; }
+            private set {
+                SetProperty(ref m_temp, value);
+
+            } }
 
         // 3-Ring
         double m_setTempA = default(double);
@@ -120,7 +139,9 @@ namespace UI_Brewer
             set
             {
                 SetProperty(ref m_setTempA, value);
-                SetTemp = (int)(value / 3.4d);
+                SetTemp = (int)Math.Round((value / 3.4d));
+               
+                simData.setSetTemp(m_setTemp);
             }
         }
         int m_setTemp = default(int);
