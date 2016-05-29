@@ -5,13 +5,7 @@ using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using Windows.Devices.Gpio;
 
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using Windows.UI.Xaml.Data;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -32,20 +26,20 @@ namespace UI_Brewer
         {
             var grid = sender as Grid;
             var angle = GetAngle(e.Position, grid.RenderSize);
-            (this.DataContext as ViewModel).AngleA = angle;
+            (this.DataContext as ViewModel).PowerA = angle;
         }
         private void Grid_ManipulationDelta_1(object sender, ManipulationDeltaRoutedEventArgs e)
         {
             var grid = sender as Grid;
             var angle = GetAngle(e.Position, grid.RenderSize);
-            (this.DataContext as ViewModel).AngleB = angle;
+            (this.DataContext as ViewModel).TempA = angle;
         }
 
         private void Grid_ManipulationDelta_2(object sender, ManipulationDeltaRoutedEventArgs e)
         {
             var grid = sender as Grid;
             var angle = GetAngle(e.Position, grid.RenderSize);
-            (this.DataContext as ViewModel).AngleC = angle;
+            (this.DataContext as ViewModel).SetTempA = angle;
         }
         #endregion
 
@@ -80,9 +74,9 @@ namespace UI_Brewer
         {
             if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
             {
-                AngleA = 180;
-                AngleB = 180;
-                AngleC = 180;
+                PowerA = 180;
+                TempA = 180;
+                SetTempA = 180;
             }
         }
 
@@ -90,47 +84,47 @@ namespace UI_Brewer
 
         #region Angels & Values
         // 1-Ring
-        double m_AngleA = default(double);
-        public double AngleA
+        double m_powerA = default(double);
+        public double PowerA
         {
-            get { return m_AngleA; }
+            get { return m_powerA; }
             set
             {
-                SetProperty(ref m_AngleA, value);
-                ValueA = (int)(value / 3.4d);
+                SetProperty(ref m_powerA, value);
+                Power = (int)(value / 3.4d);
             }
         }
 
-        int m_ValueA = default(int);
-        public int ValueA { get { return m_ValueA; } private set { SetProperty(ref m_ValueA, value); } }
+        int m_power = default(int);
+        public int Power { get { return m_power; } private set { SetProperty(ref m_power, value); } }
 
         // 2-Ring
-        double m_AngleB = default(double);
-        public double AngleB
+        double m_tempA = default(double);
+        public double TempA
         {
-            get { return m_AngleB; }
+            get { return m_tempA; }
             set
             {
-                SetProperty(ref m_AngleB, value);
-                ValueB = (int)(value / 3.4d);
+                SetProperty(ref m_tempA, value);
+                Temp = (int)(value / 3.4d);
             }
         }
-        int m_ValueB = default(int);
-        public int ValueB { get { return m_ValueB; } private set { SetProperty(ref m_ValueB, value); } }
+        int m_temp = default(int);
+        public int Temp { get { return m_temp; } private set { SetProperty(ref m_temp, value); } }
 
         // 3-Ring
-        double m_AngleC = default(double);
-        public double AngleC
+        double m_setTempA = default(double);
+        public double SetTempA
         {
-            get { return m_AngleC; }
+            get { return m_setTempA; }
             set
             {
-                SetProperty(ref m_AngleC, value);
-                ValueC = (int)(value / 3.4d);
+                SetProperty(ref m_setTempA, value);
+                SetTemp = (int)(value / 3.4d);
             }
         }
-        int m_ValueC = default(int);
-        public int ValueC { get { return m_ValueC; } private set { SetProperty(ref m_ValueC, value); } }
+        int m_setTemp = default(int);
+        public int SetTemp { get { return m_setTemp; } private set { SetProperty(ref m_setTemp, value); } }
 
         #endregion
 
