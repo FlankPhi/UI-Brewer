@@ -53,8 +53,9 @@ namespace UI_Brewer.SimulatedData
 
             // Change in temp 
             var dTemp = u * (PMAX / (double)(CP * M)) ;
-            curTemp += (dTemp - (0.2 * curTemp));
-            System.Diagnostics.Debug.WriteLine("Set temp = " + setTemp + " Cur temp = " + curTemp + " Pådrag = " + dTemp);
+            var tempDiff = 20 - curTemp;
+            curTemp += (dTemp + (0.2 * tempDiff));
+            //System.Diagnostics.Debug.WriteLine("Set temp = " + setTemp + " Cur temp = " + curTemp + " Pådrag = " + dTemp);
         }
 
         public double getCurTemp()
