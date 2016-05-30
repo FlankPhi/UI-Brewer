@@ -24,7 +24,7 @@ namespace UI_Brewer.SimulatedData
         private const int M = 25;
         private const int PMAX = 50000;
 
-        private Windows.UI.Xaml.DispatcherTimer timer;
+        private DispatcherTimer timer;
 
 
         public Simulator(int setTemp)

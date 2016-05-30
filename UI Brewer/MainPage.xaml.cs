@@ -41,6 +41,19 @@ namespace UI_Brewer
             var angle = GetAngle(e.Position, grid.RenderSize);
             (this.DataContext as ViewModel).SetTempA = angle;
         }
+
+        private void SetTotalTime(object sender, ManipulationDeltaRoutedEventArgs e)
+        {
+            var grid = sender as Grid;
+            var angle = GetAngle(e.Position, grid.RenderSize);
+            (this.DataContext as ViewModel).SetTempA = angle;
+        }
+        private void ChangeIntTime(object sender, ManipulationDeltaRoutedEventArgs e)
+        {
+            var grid = sender as Grid;
+            var angle = GetAngle(e.Position, grid.RenderSize);
+            (this.DataContext as ViewModel).SetTempA = angle;
+        }
         #endregion
 
         #region AngleCalcMethods
@@ -67,10 +80,10 @@ namespace UI_Brewer
 
         
     }
-    public class ViewModel : System.ComponentModel.INotifyPropertyChanged
+    public class ViewModel : INotifyPropertyChanged
     {
         private Simulator simData;
-        private Windows.UI.Xaml.DispatcherTimer timer;
+        private DispatcherTimer timer;
         public ViewModel()
         {
             if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
@@ -82,7 +95,7 @@ namespace UI_Brewer
 
             simData = new Simulator(0);
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(100);
+            timer.Interval = TimeSpan.FromMilliseconds(500);
             timer.Tick += updateTemp;
             timer.Start();
 
@@ -129,7 +142,8 @@ namespace UI_Brewer
             private set {
                 SetProperty(ref m_temp, value);
 
-            } }
+            }
+        }
 
         // 3-Ring
         double m_setTempA = default(double);
