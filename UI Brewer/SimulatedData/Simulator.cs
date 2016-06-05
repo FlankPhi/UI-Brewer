@@ -16,6 +16,8 @@ namespace UI_Brewer.SimulatedData
         private double i;
         private double u;
 
+        private static bool ready = false;
+
         private double Kp = .5;
         private double Ti = 80;
 
@@ -55,6 +57,13 @@ namespace UI_Brewer.SimulatedData
             var dTemp = u * (PMAX / (double)(CP * M)) ;
             var tempDiff = 20 - curTemp;
             curTemp += (dTemp + (0.2 * tempDiff));
+            if (Math.Abs(curTemp-setTemp) < 1)
+            {
+                ready = true;
+            }else
+            {
+                ready = false;
+            }
             //System.Diagnostics.Debug.WriteLine("Set temp = " + setTemp + " Cur temp = " + curTemp + " Pådrag = " + dTemp);
         }
 
@@ -69,6 +78,10 @@ namespace UI_Brewer.SimulatedData
         public void setSetTemp(int sTemp)
         {
             this.setTemp = sTemp;
+        }
+        public static bool tempReached()
+        {
+            return ready;
         }
     }
 }

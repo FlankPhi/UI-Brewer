@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Class="UI_Brewer.MainPage"
     mc:Ignorable="d">
-    
+
     <Page.DataContext>
         <local:ViewModel/>
     </Page.DataContext>
@@ -17,47 +17,13 @@
     <Grid Background="{ThemeResource AppBarItemForegroundThemeBrush}">
         <!-- Timing Grid -->
         <Grid HorizontalAlignment="Right" Height="960"  VerticalAlignment="Top" Width="706">
-            <Grid x:Name="Temp_Copy"  VerticalAlignment="Top" HorizontalAlignment="Center">
-                <!-- Ring 1 For setting totall time-->
-                <Grid Width="600" Height="600">
-                    <!-- Ring -->
-                    <my:RingSlice InnerRadius="200" Radius="250" StartAngle="0" EndAngle="240" >
-                        <my:RingSlice.Fill>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="Black" Offset="0"/>
-                                <GradientStop Color="#FFB4E120" Offset="1"/>
-                            </LinearGradientBrush>
-                        </my:RingSlice.Fill>
-                    </my:RingSlice>
+            <Grid x:Name="Time"  VerticalAlignment="Top" HorizontalAlignment="Center">
+              
 
-                    <!-- Touch knob -->
-                    <Grid RenderTransformOrigin="0.5,0.5">
-                        <Grid.RenderTransform>
-                            <CompositeTransform Rotation="240"/>
-                        </Grid.RenderTransform>
-                        <Ellipse Width="50" Height="50"  Stretch="Fill" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5"
-                                 Fill="#FFB4E120">
-                            <Ellipse.RenderTransform>
-                                <CompositeTransform TranslateY="50"/>
-                            </Ellipse.RenderTransform>
-                        </Ellipse>
-                    </Grid>
-                    <!-- Touch grid -->
-                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="SetTotalTime">
-                        <Grid.Clip>
-                            <RectangleGeometry Rect="250,50,50,50">
-                                <RectangleGeometry.Transform>
-                                    <CompositeTransform Rotation="240" CenterX="300" CenterY="300" />
-                                </RectangleGeometry.Transform>
-                            </RectangleGeometry>
-                        </Grid.Clip>
-                    </Grid>
-                </Grid>
-                
                 <!-- Ring 2 Total time count down-->
                 <Grid Width="500" Height="500" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <!-- Ring -->
-                    <my:RingSlice InnerRadius="150" Radius="200" StartAngle="0" EndAngle="240" >
+                    <my:RingSlice InnerRadius="150" Radius="200" StartAngle="0" EndAngle="{Binding SetTotTimeA}" >
                         <my:RingSlice.Fill>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="Black" Offset="0"/>
@@ -69,7 +35,7 @@
                     <!-- Touch knob -->
                     <Grid RenderTransformOrigin="0.5,0.5">
                         <Grid.RenderTransform>
-                            <CompositeTransform Rotation="240"/>
+                            <CompositeTransform Rotation="{Binding SetTotTimeA}"/>
                         </Grid.RenderTransform>
                         <Ellipse Width="50" Height="50"  Stretch="Fill" Fill="#FF21EBA8" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                             <Ellipse.RenderTransform>
@@ -79,20 +45,22 @@
                     </Grid>
 
                     <!-- Touch grid -->
-                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY">
+                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="SetTotalTime">
                         <Grid.Clip>
                             <RectangleGeometry Rect="225,50,50,50">
                                 <RectangleGeometry.Transform>
-                                    <CompositeTransform Rotation="240" CenterX="250" CenterY="250" />
+                                    <CompositeTransform Rotation="{Binding SetTotTimeA}" CenterX="250" CenterY="250" />
                                 </RectangleGeometry.Transform>
                             </RectangleGeometry>
                         </Grid.Clip>
                     </Grid>
                 </Grid>
+                
+                
                 <!-- Ring 3 For setting interval times and count down interval times-->
                 <Grid Width="400" Height="400" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <!-- Ring -->
-                    <my:RingSlice InnerRadius="100" Radius="150" StartAngle="0" EndAngle="240" >
+                    <my:RingSlice InnerRadius="100" Radius="150" StartAngle="0" EndAngle="{Binding SetIntTimeA}" >
                         <my:RingSlice.Fill>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="Black" Offset="0"/>
@@ -104,7 +72,7 @@
                     <!-- Touch knob -->
                     <Grid RenderTransformOrigin="0.5,0.5">
                         <Grid.RenderTransform>
-                            <CompositeTransform Rotation="240"/>
+                            <CompositeTransform Rotation="{Binding SetIntTimeA}"/>
                         </Grid.RenderTransform>
                         <Ellipse Width="50" Height="50"  Stretch="Fill" Fill="#FF23D4F6" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                             <Ellipse.RenderTransform>
@@ -113,11 +81,11 @@
                         </Ellipse>
                     </Grid>
                     <!-- Touch grid -->
-                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangeIntTime">
+                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangeIntTime" PointerReleased="ConfirmIntTime">
                         <Grid.Clip>
                             <RectangleGeometry Rect="175,50,50,50">
                                 <RectangleGeometry.Transform>
-                                    <CompositeTransform Rotation="240" CenterX="200" CenterY="200" />
+                                    <CompositeTransform Rotation="{Binding SetIntTimeA}" CenterX="200" CenterY="200" />
                                 </RectangleGeometry.Transform>
                             </RectangleGeometry>
                         </Grid.Clip>
@@ -129,10 +97,10 @@
                         <CompositeTransform TranslateY="20"/>
                     </TextBlock.RenderTransform>  
         			<Run Text="Total"/><LineBreak/>
-        			<Run Foreground="White" Text="80"/>
+        			<Run Foreground="White" Text="{Binding SetTotTime}"/>
         			<Run Text=" m"/><LineBreak/>   
         			<Run Text="Interv"/><LineBreak/>
-        			<Run Foreground="White" Text="80"/>
+        			<Run Foreground="White" Text="{Binding SetIntTime}"/>
         			<Run Text=" m"/><LineBreak/>
                 </TextBlock>
             </Grid>

@@ -103,7 +103,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimulatedData\Simulator.cs" />
-    <Compile Include="SimulatedData\Timer.cs" />
+    <Compile Include="SimulatedData\BrewingTimer.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
