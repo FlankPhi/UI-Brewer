@@ -20,6 +20,7 @@ namespace UI_Brewer
         public MainPage()
         {
             this.InitializeComponent();
+            Simulator.initGpio();
         }
 
         #region touchEvents

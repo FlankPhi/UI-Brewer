@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using Windows.UI.Xaml;
+using Windows.Devices.Gpio;
 
 namespace UI_Brewer.SimulatedData
 {
@@ -27,7 +28,27 @@ namespace UI_Brewer.SimulatedData
         private const int PMAX = 50000;
 
         private DispatcherTimer timer;
+        private DispatcherTimer timer2;
+        private int counter = 0;
+        private bool ledStatus = false;
 
+        private static GpioController gpio;
+        private static GpioPin pin;
+
+        public static void initGpio()
+        {
+            Debug.WriteLine("Init Gpio");
+            gpio = GpioController.GetDefault();
+            
+            if (gpio != null)
+            {
+                pin = gpio.OpenPin(26);
+                Debug.WriteLine("Init OK");
+                Debug.WriteLine("Writing high");                                
+                pin.SetDriveMode(GpioPinDriveMode.Output);
+                pin.Write(GpioPinValue.Low);
+            }
+        }
 
         public Simulator(int setTemp)
         {
@@ -40,31 +61,81 @@ namespace UI_Brewer.SimulatedData
             timer.Tick += updateTemp;
             timer.Start();
 
+            timer2 = new DispatcherTimer();
+            timer2.Interval = TimeSpan.FromMilliseconds(0.1);
+            timer2.Tick += pulseLed;
+            timer2.Start();
+            
+        }
+        private void pulseLed(object sender, object e)
+        {
+            if (BrewingTimer.StillCounting())
+            {
+                counter++;
+                if (counter < 100)
+                {
+                    if (counter < u && !ledStatus)
+                    {
+                        //Debug.WriteLine("setting led high " + u);
+                        pin.Write(GpioPinValue.High);
+                        ledStatus = true;
+                    }
+                    else if (counter  >= u && ledStatus)
+                    {
+                        //Debug.WriteLine("setting led low " + u);
+                        pin.Write(GpioPinValue.Low);
+                        ledStatus = false;
+                    }
+                    else
+                    {
+                        // pin was correct value do nothing
+                    }
+                }
+
+                else
+                {
+                    counter = 0;
+                    pin.Write(GpioPinValue.Low);
+                    ledStatus = false;
+                }
+            }else if (ledStatus)
+            {
+                
+                pin.Write(GpioPinValue.Low);
+            }
+            //Debug.WriteLine("Counter " + counter + " Effekt " + u + " Still Counting " + BrewingTimer.StillCounting()
+              //  + " Led status " + ledStatus);
         }
         private void updateTemp(object sender, object e)
         {
-            // error
-            var error = setTemp - curTemp;
-            
-             // Regulator
-            p = Kp * error;
-            i += 1 / Ti * error;                        
-            i = Math.Max(Math.Min(100, i), 0);  // Anti windup
-            u = p + (i * Kp);
-            u = Math.Max(Math.Min(100, u), 0);  // Min value 0 Max value 100
+            if (BrewingTimer.StillCounting())
+            {
+                // error
+                var error = setTemp - curTemp;
 
-            // Change in temp 
-            var dTemp = u * (PMAX / (double)(CP * M)) ;
-            var tempDiff = 20 - curTemp;
-            curTemp += (dTemp + (0.2 * tempDiff));
-            if (Math.Abs(curTemp-setTemp) < 1)
-            {
-                ready = true;
-            }else
-            {
-                ready = false;
+                // Regulator
+                p = Kp * error;
+                i += 1 / Ti * error;
+                i = Math.Max(Math.Min(100, i), 0);  // Anti windup
+                u = p + (i * Kp);
+                u = Math.Max(Math.Min(100, u), 0);  // Min value 0 Max value 100
+
+                // Change in temp 
+                var dTemp = u * (PMAX / (double)(CP * M));
+                var tempDiff = 20 - curTemp;
+                curTemp += (dTemp + (0.2 * tempDiff));
+                if (Math.Abs(curTemp - setTemp) < 1)
+                {
+                    ready = true;
+                }
+                else
+                {
+                    ready = false;
+                }
+                //System.Diagnostics.Debug.WriteLine("Set temp = " + setTemp + " Cur temp = " + curTemp + " Pådrag = " + dTemp);
+
             }
-            //System.Diagnostics.Debug.WriteLine("Set temp = " + setTemp + " Cur temp = " + curTemp + " Pådrag = " + dTemp);
+            else { u = 0; }
         }
 
         public double getCurTemp()

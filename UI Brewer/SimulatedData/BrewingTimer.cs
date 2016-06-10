@@ -16,7 +16,7 @@ namespace UI_Brewer.SimulatedData
         private int totTime;
         private List<int> intTime = new List<int>();
         private double curTime;
-        private double totTimeRem = 0;
+        private static double totTimeRem = 0;
         private double intTimeRem;
         private Stopwatch stopwatch;
 
@@ -55,7 +55,7 @@ namespace UI_Brewer.SimulatedData
         }
         public double getIntTimeRem()
         {
-            if (stopwatch.IsRunning)
+            if (stopwatch.IsRunning && intTime.Count > 0)
             {                
                 if (TimeSpan.FromSeconds(intTime.Max()).TotalMilliseconds > totTimeRem)
                 {
@@ -84,6 +84,7 @@ namespace UI_Brewer.SimulatedData
         public void setTotTime(int newTime)
         {
             this.totTime = (int)TimeSpan.FromSeconds(newTime).TotalMilliseconds;
+            totTimeRem = this.totTime;
             stopwatch.Reset();
         }
         public void setIntTime(int intTime)
@@ -97,5 +98,9 @@ namespace UI_Brewer.SimulatedData
                 Debug.Write(this.intTime.ElementAt(i) + ", ");
             }
         }
+        public static bool StillCounting()
+        {
+            return totTimeRem > 0;
+        } 
     }
 }
