@@ -125,7 +125,7 @@ namespace UI_Brewer
             Temp = (int) Math.Round(simData.getCurTemp());
             TempA = simData.getCurTemp() * 3.4;
             Power = (int)Math.Round(simData.getPower());
-            PowerA = simData.getPower() * 3.4;
+            PowerA = simData.getPower() * 3.6;
             if (Simulator.tempReached())
             {
                 SetTotTimeA = timData.getRemTimeRem() * 3;
@@ -137,6 +137,7 @@ namespace UI_Brewer
 
 
         }
+
         #region Dials
 
         #region Angels & Values
@@ -150,7 +151,7 @@ namespace UI_Brewer
             set
             {
                 SetProperty(ref m_powerA, value);
-                Power = (int)Math.Round((value / 3.4d));
+                Power = (int)Math.Round((value / 3.6d));
             }
         }
 

@@ -1,25 +1,24 @@
-﻿using System;
+﻿#region Imports
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading;
-
-
-
-
+#endregion
 
 namespace UI_Brewer.SimulatedData
 {
     class BrewingTimer
     {
+        #region Vars
         private int totTime;
         private List<int> intTime = new List<int>();
         private double curTime;
         private static double totTimeRem = 0;
         private double intTimeRem;
         private Stopwatch stopwatch;
+        #endregion
 
+        #region Inits
         public BrewingTimer()
         {
             stopwatch = new Stopwatch();
@@ -30,60 +29,59 @@ namespace UI_Brewer.SimulatedData
             this.totTime = totTime;
             stopwatch.Start();
         }
+        #endregion
 
-        
+        #region Getters & Setters
         public double getRemTimeRem()
         {
             if (stopwatch.IsRunning)
-            {
-                //Debug.WriteLine("stopwatch" + stopwatch.ElapsedMilliseconds);
-                totTimeRem = totTime - (int) stopwatch.ElapsedMilliseconds;
-                //Debug.WriteLine("time rem " + totTimeRem);
+            {                
+                totTimeRem = totTime - (int) stopwatch.ElapsedMilliseconds;             
                 if (totTimeRem < 0)
                 {
                     totTimeRem = 0;
                     totTime = 0;
                     stopwatch.Stop();
                 }
-                return TimeSpan.FromMilliseconds(totTimeRem).TotalSeconds;
+                return TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes;
             }
             else if (Simulator.tempReached())
             {
                 stopwatch.Start();
             }
-            return TimeSpan.FromMilliseconds(totTime).TotalSeconds;
+            return TimeSpan.FromMilliseconds(totTime).TotalMinutes;
         }
         public double getIntTimeRem()
         {
             if (stopwatch.IsRunning && intTime.Count > 0)
             {                
-                if (TimeSpan.FromSeconds(intTime.Max()).TotalMilliseconds > totTimeRem)
+                if (TimeSpan.FromMinutes(intTime.Max()).TotalMilliseconds > totTimeRem)
                 {
                     if (this.intTime.Count > 1)
                     {
                         // inn here interval time reached
                         intTime.Remove(intTime.Max());
-                        Debug.WriteLine("Interval ellapsed " + TimeSpan.FromMilliseconds(totTimeRem).TotalSeconds);
+                        Debug.WriteLine("Interval ellapsed " + TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes);
                     }
                     
                 }
                 if (intTimeRem > 0)
                 {
-                    intTimeRem = totTimeRem - TimeSpan.FromSeconds(intTime.Max()).TotalMilliseconds;
+                    intTimeRem = totTimeRem - TimeSpan.FromMinutes(intTime.Max()).TotalMilliseconds;
                 }
                 else
                 {
                     intTimeRem = 0;
                 }
-                    return TimeSpan.FromMilliseconds(intTimeRem).TotalSeconds;
+                    return TimeSpan.FromMilliseconds(intTimeRem).TotalMinutes;
                 }
             
-            return TimeSpan.FromMilliseconds(intTimeRem).TotalSeconds;
+            return TimeSpan.FromMilliseconds(intTimeRem).TotalMinutes;
         }
 
         public void setTotTime(int newTime)
         {
-            this.totTime = (int)TimeSpan.FromSeconds(newTime).TotalMilliseconds;
+            this.totTime = (int)TimeSpan.FromMinutes(newTime).TotalMilliseconds;
             totTimeRem = this.totTime;
             stopwatch.Reset();
         }
@@ -104,3 +102,4 @@ namespace UI_Brewer.SimulatedData
         } 
     }
 }
+#endregion

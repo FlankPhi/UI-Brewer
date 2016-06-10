@@ -142,7 +142,7 @@
                     </Grid>
                 </Grid>
 
-                <!-- Ring 2 -->
+                <!-- Ring 2 True temperture-->
                 <Grid Width="500" Height="500" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <!-- Ring -->
                     <my:RingSlice InnerRadius="150" Radius="200" StartAngle="0" EndAngle="{Binding TempA}" RenderTransformOrigin="0.5,0.5" >
@@ -177,7 +177,7 @@
                     </Grid>
                 </Grid>
 
-                <!-- Ring 3 -->
+                <!-- Ring 3 Power use in prosentage-->
                 <Grid Width="400" Height="400" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <!-- Ring -->
                     <my:RingSlice InnerRadius="100" Radius="150" StartAngle="0" EndAngle="{Binding PowerA}" >
@@ -218,10 +218,10 @@
                     </TextBlock.RenderTransform>  
         			<Run Text="Set Temp"/><LineBreak/>
         			<Run Foreground="White" Text="{Binding SetTemp}"/>
-        			<Run Text="C"/><LineBreak/>   
+        			<Run Text="°C"/><LineBreak/>   
         			<Run Text="Temp"/><LineBreak/>
         			<Run Foreground="White" Text="{Binding Temp}"/>
-        			<Run Text="C"/><LineBreak/>
+        			<Run Text="°C"/><LineBreak/>
                 </TextBlock>
             </Grid>
         </Grid>

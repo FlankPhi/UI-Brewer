@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+#region Imports
+using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using Windows.UI.Xaml;
 using Windows.Devices.Gpio;
+#endregion
 
 namespace UI_Brewer.SimulatedData
 {
     public class Simulator
     {
+
+        #region Vars
         private double setTemp;
         private double curTemp;
         private double p;
@@ -34,8 +35,10 @@ namespace UI_Brewer.SimulatedData
 
         private static GpioController gpio;
         private static GpioPin pin;
+        #endregion
 
-        public static void initGpio()
+        #region Inits
+        public static void initGpio()        
         {
             Debug.WriteLine("Init Gpio");
             gpio = GpioController.GetDefault();
@@ -43,8 +46,7 @@ namespace UI_Brewer.SimulatedData
             if (gpio != null)
             {
                 pin = gpio.OpenPin(26);
-                Debug.WriteLine("Init OK");
-                Debug.WriteLine("Writing high");                                
+                Debug.WriteLine("Init OK");                           
                 pin.SetDriveMode(GpioPinDriveMode.Output);
                 pin.Write(GpioPinValue.Low);
             }
@@ -67,6 +69,9 @@ namespace UI_Brewer.SimulatedData
             timer2.Start();
             
         }
+        #endregion
+
+        #region Threads
         private void pulseLed(object sender, object e)
         {
             if (BrewingTimer.StillCounting())
@@ -137,7 +142,9 @@ namespace UI_Brewer.SimulatedData
             }
             else { u = 0; }
         }
+        #endregion
 
+        #region Getters & Setters
         public double getCurTemp()
         {
             return curTemp;
@@ -156,3 +163,4 @@ namespace UI_Brewer.SimulatedData
         }
     }
 }
+#endregion
