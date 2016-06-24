@@ -5,8 +5,13 @@
     xmlns:local="using:UI_Brewer"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Converters="using:UI_Brewer.Converters"
     x:Class="UI_Brewer.MainPage"
     mc:Ignorable="d">
+
+    <Page.Resources>
+        <Converters:FromStateToColor x:Key="FromStateToColor"/>
+    </Page.Resources>
 
     <Page.DataContext>
         <local:ViewModel/>
@@ -18,7 +23,7 @@
         <!-- Timing Grid -->
         <Grid HorizontalAlignment="Right" Height="960"  VerticalAlignment="Top" Width="706">
             <Grid x:Name="Time"  VerticalAlignment="Top" HorizontalAlignment="Center">
-              
+
 
                 <!-- Ring 2 Total time count down-->
                 <Grid Width="500" Height="500" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -55,11 +60,11 @@
                         </Grid.Clip>
                     </Grid>
                 </Grid>
-                
-                
+
+
                 <!-- Ring 3 For setting interval times and count down interval times-->
                 <Grid Width="400" Height="400" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <MediaElement Name="MyMediaElement" AutoPlay="True" Volume="0.5" AudioCategory="SoundEffects" />
+                    <MediaElement x:Name="MyMediaElement" AutoPlay="True" Volume="0.5" AudioCategory="SoundEffects" />
                     <!-- Ring -->
                     <my:RingSlice InnerRadius="100" Radius="150" StartAngle="0" EndAngle="{Binding SetIntTimeA}" >
                         <my:RingSlice.Fill>
@@ -97,12 +102,12 @@
                     <TextBlock.RenderTransform>
                         <CompositeTransform TranslateY="20"/>
                     </TextBlock.RenderTransform>  
-        			<Run Text="Total"/><LineBreak/>
-        			<Run Foreground="White" Text="{Binding SetTotTime}"/>
-        			<Run Text=" m"/><LineBreak/>   
-        			<Run Text="Interv"/><LineBreak/>
-        			<Run Foreground="White" Text="{Binding SetIntTime}"/>
-        			<Run Text=" m"/><LineBreak/>
+					<Run Text="Total"/><LineBreak/>
+					<Run Foreground="White" Text="{Binding SetTotTime}"/>
+					<Run Text=" m"/><LineBreak/>   
+					<Run Text="Interv"/><LineBreak/>
+					<Run Foreground="White" Text="{Binding SetIntTime}"/>
+					<Run Text=" m"/><LineBreak/>
                 </TextBlock>
             </Grid>
         </Grid>
@@ -217,14 +222,16 @@
                     <TextBlock.RenderTransform>
                         <CompositeTransform TranslateY="20"/>
                     </TextBlock.RenderTransform>  
-        			<Run Text="Set Temp"/><LineBreak/>
-        			<Run Foreground="White" Text="{Binding SetTemp}"/>
-        			<Run Text="°C"/><LineBreak/>   
-        			<Run Text="Temp"/><LineBreak/>
-        			<Run Foreground="White" Text="{Binding Temp}"/>
-        			<Run Text="°C"/><LineBreak/>
+					<Run Text="Set Temp"/><LineBreak/>
+					<Run Foreground="White" Text="{Binding SetTemp}"/>
+					<Run Text="°C"/><LineBreak/>   
+					<Run Text="Temp"/><LineBreak/>
+					<Run Foreground="White" Text="{Binding Temp}"/>
+					<Run Text="°C"/><LineBreak/>
                 </TextBlock>
             </Grid>
+            <Ellipse Fill="{Binding Heater, Converter={StaticResource FromStateToColor}}" HorizontalAlignment="Left" Height="100" Margin="663,554,-48,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
+            
         </Grid>
     </Grid>
 </Page>

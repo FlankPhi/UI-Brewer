@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using UI_Brewer.SimulatedData;
+using UI_Brewer.Model;
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -23,7 +23,7 @@ namespace UI_Brewer
         public MainPage()
         {
             InitializeComponent();
-            Simulator.initGpio();
+            Brewer.initGpio();
             // Statup soundplayed
             MyMediaElement.Source = new Uri(BaseUri, bellSound);            
         }
@@ -110,7 +110,7 @@ namespace UI_Brewer
 
     public class ViewModel : INotifyPropertyChanged
     {
-        private Simulator simData;
+        private Brewer brewerObject;
         private BrewingTimer timData;
         private DispatcherTimer timer;
         public ViewModel()
@@ -120,12 +120,14 @@ namespace UI_Brewer
                 PowerA = 180;
                 TempA = 180;
                 SetTempA = 180;
+                Heater = false;
             }
             timData = new BrewingTimer();
             //timData.startTotTime(20000);
-            simData = new Simulator(0);
+            brewerObject = new Brewer(60);
+            Temp = 60;
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(1000);
+            timer.Interval = TimeSpan.FromMilliseconds(100);
             timer.Tick += updateTemp;
             timer.Start();
 
@@ -136,11 +138,13 @@ namespace UI_Brewer
         }
         public void updateTemp(object sender, object e)
         {
-            Temp = (int) Math.Round(simData.getCurTemp());
-            TempA = simData.getCurTemp() * 3.4;
-            Power = (int)Math.Round(simData.getPower());
-            PowerA = simData.getPower() * 3.6;
-            if (Simulator.tempReached())
+            Temp = (int) Math.Round(brewerObject.getCurTemp());
+            TempA = brewerObject.getCurTemp() * 3.4;
+            Power = (int)Math.Round(brewerObject.getPower());
+            PowerA = brewerObject.getPower() * 3.6;
+            Heater = Brewer.heaterOn;
+            
+            if (Brewer.tempReached())
             {                
                 SetTotTimeA = timData.getRemTimeRem() * 3;
                 SetTotTime = (int)(timData.getRemTimeRem());
@@ -156,7 +160,16 @@ namespace UI_Brewer
         #region Dials
 
         #region Angels & Values
-
+        
+        bool m_Heater = default(bool);
+        public bool Heater
+        {
+            get { return m_Heater; }
+            set
+            {
+                SetProperty(ref m_Heater, value);
+            }
+        }
         #region Temperature
         // 1-Ring
         double m_powerA = default(double);
@@ -203,7 +216,7 @@ namespace UI_Brewer
                 SetProperty(ref m_setTempA, value);
                 SetTemp = (int)Math.Round((value / 3.4d));
                
-                simData.setSetTemp(m_setTemp);
+                brewerObject.setSetTemp(m_setTemp);
             }
         }
         int m_setTemp = default(int);

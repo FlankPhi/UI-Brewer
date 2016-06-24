@@ -6,9 +6,9 @@ using Windows.UI.Xaml;
 using Windows.Devices.Gpio;
 #endregion
 
-namespace UI_Brewer.SimulatedData
+namespace UI_Brewer.Model
 {
-    public class Simulator
+    public class Brewer
     {
 
         #region Vars
@@ -20,9 +20,11 @@ namespace UI_Brewer.SimulatedData
 
         private static bool ready = false;
 
-        private double Kp = .5;
-        private double Ti = 80;
+        // PID parameters
+        private const double Kp = .5;
+        private const double Ti = 80;
 
+        // Model parameters (for futre work)
         private const int CP = 4200;
         private const int RHO = 1000;
         private const int M = 25;
@@ -31,10 +33,13 @@ namespace UI_Brewer.SimulatedData
         private DispatcherTimer timer;
         private DispatcherTimer timer2;
         private int counter = 0;
-        private bool ledStatus = false;
 
         private static GpioController gpio;
         private static GpioPin pin;
+
+        public static bool heaterOn { get; private set; }
+
+
         #endregion
 
         #region Inits
@@ -52,7 +57,7 @@ namespace UI_Brewer.SimulatedData
             }
         }
 
-        public Simulator(int setTemp)
+        public Brewer(int setTemp)
         {
             
             this.setTemp = setTemp;
@@ -64,16 +69,16 @@ namespace UI_Brewer.SimulatedData
             timer.Start();
 
             timer2 = new DispatcherTimer();
-            timer2.Interval = TimeSpan.FromMilliseconds(1);
-            timer2.Tick += pulseLed;
+            timer2.Interval = TimeSpan.FromMilliseconds(100);
+            timer2.Tick += pwmHeater;
             timer2.Start();
             
         }
         #endregion
 
         #region Threads
-
-        private void pulseLed(object sender, object e)
+        // Send power to the heater
+        private void pwmHeater(object sender, object e)
         {
             if (BrewingTimer.StillCounting())
             {
@@ -87,40 +92,37 @@ namespace UI_Brewer.SimulatedData
                     {
                         modu = 1 - modu;
                     }
-
                     
-                    if (modu > 0 )
+                    if (modu > 0 && heaterOn)
                     {
                         // Debug.WriteLine("setting led low " + u + " modu " + modu);
                         pin.Write(GpioPinValue.Low);
-                        ledStatus = false;
+                        heaterOn = false;
                     }
-                    else if (modu <= 0)
+                    else if (modu <= 0 && !heaterOn)
                     {
                         // Debug.WriteLine("setting led high " + u + " modu " + modu);
                         pin.Write(GpioPinValue.High);
-                        ledStatus = true;
+                        heaterOn = true;
                     }
                     else
                     {
-                        // pin was correct value do nothing
+                        // pin is in correct state; do nothing
                     }
                 }
 
                 else
-                {
+                {   // Cykle finnished sett pin low for safty issues
                     counter = 0;
                     pin.Write(GpioPinValue.Low);
-                    ledStatus = false;
+                    heaterOn = false;
                 }
-            }else if (ledStatus)
-            {
-                
+            }else if (heaterOn)
+            {                
                 pin.Write(GpioPinValue.Low);
             }
-            //Debug.WriteLine("Counter " + counter + " Effekt " + u + " Still Counting " + BrewingTimer.StillCounting()
-              //  + " Led status " + ledStatus);
         }
+        // part of simulator
         private void updateTemp(object sender, object e)
         {
             if (BrewingTimer.StillCounting())

@@ -7,14 +7,14 @@ using System.Linq;
 
 #endregion
 
-namespace UI_Brewer.SimulatedData
+namespace UI_Brewer.Model
 {
     class BrewingTimer
     {
         #region Vars
         private int totTime;
         private List<int> intTime = new List<int>();
-        private double curTime;
+        //private double curTime;
         private static double totTimeRem = 0;
         private double intTimeRem;
         private Stopwatch stopwatch;
@@ -58,7 +58,7 @@ namespace UI_Brewer.SimulatedData
                 }
                 return TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes;
             }
-            else if (Simulator.tempReached())
+            else if (Brewer.tempReached())
             {
                 stopwatch.Start();
             }
