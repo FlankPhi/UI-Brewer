@@ -19,7 +19,7 @@ namespace UI_Brewer
     public sealed partial class MainPage : Page
     {
         private const string bellSound = "/Assets/Bell.wav";
-        private bool intTimeSoundPlayed = true;
+        // private bool intTimeSoundPlayed = true;
         public MainPage()
         {
             InitializeComponent();
@@ -102,10 +102,23 @@ namespace UI_Brewer
             return _Value;
         }
 
+
+
         #endregion
 
+        private void clickDown(object sender, PointerRoutedEventArgs e)
+        {
+            //Debug.WriteLine("user entering power");
+            Brewer.userSetPower = true;
+            setPower.Visibility = Visibility.Visible;
+        }
 
-
+        private void powerDtapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            //Debug.WriteLine("user stoped entering power");
+            Brewer.userSetPower = false;
+            setPower.Visibility = Visibility.Collapsed;
+        }
     }
 
     public class ViewModel : INotifyPropertyChanged
@@ -184,7 +197,13 @@ namespace UI_Brewer
         }
 
         int m_power = default(int);
-        public int Power { get { return m_power; } private set { SetProperty(ref m_power, value); } }
+        public int Power {
+            get { return m_power; }
+            private set {
+                SetProperty(ref m_power, value);
+                brewerObject.setPower(value);
+            }
+        }
 
         // 2-Ring
         double m_tempA = default(double);

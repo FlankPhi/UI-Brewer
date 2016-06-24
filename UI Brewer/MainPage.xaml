@@ -6,10 +6,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Converters="using:UI_Brewer.Converters"
+    xmlns:Common="using:Gauge.Common"
     x:Class="UI_Brewer.MainPage"
     mc:Ignorable="d">
 
     <Page.Resources>
+        <Common:NegativConverter x:Key="NegativConverter"/>
         <Converters:FromStateToColor x:Key="FromStateToColor"/>
     </Page.Resources>
 
@@ -195,7 +197,6 @@
                         </my:RingSlice.Fill>
                     </my:RingSlice>
 
-                    <!-- Touch knob -->
                     <Grid RenderTransformOrigin="0.5,0.5">
                         <Grid.RenderTransform>
                             <CompositeTransform Rotation="{Binding PowerA}"/>
@@ -205,9 +206,17 @@
                                 <CompositeTransform TranslateY="50"/>
                             </Ellipse.RenderTransform>
                         </Ellipse>
+                        <TextBlock Name="setPower" VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="28" 
+							Foreground="Gray" TextAlignment="Center" RenderTransformOrigin="0.5,0.5" Visibility="Collapsed">
+                            <TextBlock.RenderTransform>
+                                <CompositeTransform Rotation="{Binding PowerA, Converter={StaticResource NegativConverter}}"/>
+                            </TextBlock.RenderTransform>
+                            <Run Text="{Binding Power}"/>
+                            <Run Text="%"/>
+                        </TextBlock>
                     </Grid>
                     <!-- Touch grid -->
-                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="Grid_ManipulationDelta">
+                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="Grid_ManipulationDelta" PointerPressed="clickDown" DoubleTapped="powerDtapped">
                         <Grid.Clip>
                             <RectangleGeometry Rect="175,50,50,50">
                                 <RectangleGeometry.Transform>
@@ -215,6 +224,7 @@
                                 </RectangleGeometry.Transform>
                             </RectangleGeometry>
                         </Grid.Clip>
+                        <TextBlock />
                     </Grid>
                 </Grid>
                 <!-- Temp Text -->
@@ -231,7 +241,7 @@
                 </TextBlock>
             </Grid>
             <Ellipse Fill="{Binding Heater, Converter={StaticResource FromStateToColor}}" HorizontalAlignment="Left" Height="100" Margin="663,554,-48,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
-            
+
         </Grid>
     </Grid>
 </Page>

@@ -37,8 +37,9 @@ namespace UI_Brewer.Model
         private static GpioController gpio;
         private static GpioPin pin;
 
+        // Values shared with view controller
         public static bool heaterOn { get; private set; }
-
+        public static bool userSetPower;
 
         #endregion
 
@@ -59,6 +60,7 @@ namespace UI_Brewer.Model
 
         public Brewer(int setTemp)
         {
+            userSetPower = false;
             
             this.setTemp = setTemp;
             this.curTemp = 0;
@@ -69,7 +71,7 @@ namespace UI_Brewer.Model
             timer.Start();
 
             timer2 = new DispatcherTimer();
-            timer2.Interval = TimeSpan.FromMilliseconds(100);
+            timer2.Interval = TimeSpan.FromMilliseconds(1);
             timer2.Tick += pwmHeater;
             timer2.Start();
             
@@ -130,13 +132,15 @@ namespace UI_Brewer.Model
                 // error
                 var error = setTemp - curTemp;
 
-                // Regulator
-                p = Kp * error;
-                i += 1 / Ti * error;
-                i = Math.Max(Math.Min(100, i), 0);  // Anti windup
-                u = p + (i * Kp);
-                u = Math.Max(Math.Min(100, u), 0);  // Min value 0 Max value 100
-
+                if (!userSetPower)
+                {
+                    // Regulator
+                    p = Kp * error;
+                    i += 1 / Ti * error;
+                    i = Math.Max(Math.Min(100, i), 0);  // Anti windup
+                    u = p + (i * Kp);
+                    u = Math.Max(Math.Min(100, u), 0);  // Min value 0 Max value 100
+                }
                 // Change in temp 
                 var dTemp = u * (PMAX / (double)(CP * M));
                 var tempDiff = 20 - curTemp;
@@ -164,6 +168,13 @@ namespace UI_Brewer.Model
         public double getPower()
         {
             return u;
+        }
+        public void setPower(int u)
+        {
+            if (userSetPower)
+            {
+                this.u = u;
+            }
         }
         public void setSetTemp(int sTemp)
         {
