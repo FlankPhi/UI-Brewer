@@ -59,6 +59,7 @@
                 
                 <!-- Ring 3 For setting interval times and count down interval times-->
                 <Grid Width="400" Height="400" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <MediaElement Name="MyMediaElement" AutoPlay="True" Volume="0.5" AudioCategory="SoundEffects" />
                     <!-- Ring -->
                     <my:RingSlice InnerRadius="100" Radius="150" StartAngle="0" EndAngle="{Binding SetIntTimeA}" >
                         <my:RingSlice.Fill>

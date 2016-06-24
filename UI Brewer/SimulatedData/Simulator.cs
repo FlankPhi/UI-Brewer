@@ -64,7 +64,7 @@ namespace UI_Brewer.SimulatedData
             timer.Start();
 
             timer2 = new DispatcherTimer();
-            timer2.Interval = TimeSpan.FromMilliseconds(0.1);
+            timer2.Interval = TimeSpan.FromMilliseconds(1);
             timer2.Tick += pulseLed;
             timer2.Start();
             
@@ -72,24 +72,34 @@ namespace UI_Brewer.SimulatedData
         #endregion
 
         #region Threads
+
         private void pulseLed(object sender, object e)
         {
             if (BrewingTimer.StillCounting())
             {
                 counter++;
+                double cykle = Math.Min(u, 100 - u);
+                cykle = (int) Math.Round(100 / cykle);
                 if (counter < 100)
                 {
-                    if (counter < u && !ledStatus)
+                    double modu = counter % cykle;
+                    if (u > 50)
                     {
-                        //Debug.WriteLine("setting led high " + u);
-                        pin.Write(GpioPinValue.High);
-                        ledStatus = true;
+                        modu = 1 - modu;
                     }
-                    else if (counter  >= u && ledStatus)
+
+                    
+                    if (modu > 0 )
                     {
-                        //Debug.WriteLine("setting led low " + u);
+                        // Debug.WriteLine("setting led low " + u + " modu " + modu);
                         pin.Write(GpioPinValue.Low);
                         ledStatus = false;
+                    }
+                    else if (modu <= 0)
+                    {
+                        // Debug.WriteLine("setting led high " + u + " modu " + modu);
+                        pin.Write(GpioPinValue.High);
+                        ledStatus = true;
                     }
                     else
                     {

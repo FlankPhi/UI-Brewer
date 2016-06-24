@@ -8,6 +8,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
+
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace UI_Brewer
@@ -17,10 +18,20 @@ namespace UI_Brewer
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private const string bellSound = "/Assets/Bell.wav";
+        private bool intTimeSoundPlayed = true;
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             Simulator.initGpio();
+            // Statup soundplayed
+            MyMediaElement.Source = new Uri(BaseUri, bellSound);            
+        }
+
+        public void playSound(string file)
+        {
+            //MyMediaElement.Source = new Uri(BaseUri, file);
+
         }
 
         #region touchEvents
@@ -29,6 +40,7 @@ namespace UI_Brewer
             var grid = sender as Grid;
             var angle = GetAngle(e.Position, grid.RenderSize);
             (this.DataContext as ViewModel).PowerA = angle;
+            
         }
         private void Grid_ManipulationDelta_1(object sender, ManipulationDeltaRoutedEventArgs e)
         {
@@ -58,13 +70,14 @@ namespace UI_Brewer
             var grid = sender as Grid;
             var angle = GetAngle(e.Position, grid.RenderSize);
             (this.DataContext as ViewModel).SetIntTimeA = angle;
+          
             //(this.DataContext as ViewModel).SetIntTime = (int) (angle/3d);
         }
 
         private void ConfirmIntTime(object sender, PointerRoutedEventArgs e)
         {
             (this.DataContext as ViewModel).SetIntTimetemp = (this.DataContext as ViewModel).SetIntTimeA;
-            Debug.WriteLine("value set");
+            
         }
         #endregion
 
@@ -94,6 +107,7 @@ namespace UI_Brewer
 
 
     }
+
     public class ViewModel : INotifyPropertyChanged
     {
         private Simulator simData;
@@ -111,7 +125,7 @@ namespace UI_Brewer
             //timData.startTotTime(20000);
             simData = new Simulator(0);
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(500);
+            timer.Interval = TimeSpan.FromMilliseconds(1000);
             timer.Tick += updateTemp;
             timer.Start();
 
@@ -127,12 +141,13 @@ namespace UI_Brewer
             Power = (int)Math.Round(simData.getPower());
             PowerA = simData.getPower() * 3.6;
             if (Simulator.tempReached())
-            {
+            {                
                 SetTotTimeA = timData.getRemTimeRem() * 3;
                 SetTotTime = (int)(timData.getRemTimeRem());
                 //System.Diagnostics.Debug.WriteLine("Time remaning angel = " + SetTotTimeA + " Time remaning = " + SetTotTime);
                 SetIntTimeA = timData.getIntTimeRem() * 3;
                 SetIntTime = (int)(timData.getIntTimeRem());
+                
             }
 
 

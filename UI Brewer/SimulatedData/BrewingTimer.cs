@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+
+
 #endregion
 
 namespace UI_Brewer.SimulatedData
@@ -16,12 +18,14 @@ namespace UI_Brewer.SimulatedData
         private static double totTimeRem = 0;
         private double intTimeRem;
         private Stopwatch stopwatch;
+        //private MainPage mp;
         #endregion
 
         #region Inits
         public BrewingTimer()
         {
-            stopwatch = new Stopwatch();
+           stopwatch = new Stopwatch();
+           // mp = new MainPage(); 
         }
 
         public void startTotTime(int totTime)
@@ -30,6 +34,15 @@ namespace UI_Brewer.SimulatedData
             stopwatch.Start();
         }
         #endregion
+
+        //private void playSound(string path)
+        //{
+        //    System.Media.SoundPlayer player =
+        //        new System.Media.SoundPlayer();
+        //    player.SoundLocation = path;
+        //    player.Load();
+        //    player.Play();
+        //}
 
         #region Getters & Setters
         public double getRemTimeRem()
@@ -57,11 +70,12 @@ namespace UI_Brewer.SimulatedData
             {                
                 if (TimeSpan.FromMinutes(intTime.Max()).TotalMilliseconds > totTimeRem)
                 {
-                    if (this.intTime.Count > 1)
+                    if (this.intTime.Count >= 1)
                     {
                         // inn here interval time reached
-                        intTime.Remove(intTime.Max());
-                        Debug.WriteLine("Interval ellapsed " + TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes);
+                        if (intTime.Count > 1)
+                            intTime.Remove(intTime.Max());
+                        Debug.WriteLine("Interval ellapsed " + TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes);             
                     }
                     
                 }
