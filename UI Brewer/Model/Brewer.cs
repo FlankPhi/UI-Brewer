@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.Devices.Gpio;
+using ABElectronics_Win10IOT_Libraries;
 #endregion
 
 namespace UI_Brewer.Model
