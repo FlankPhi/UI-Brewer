@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.Devices.Gpio;
 using ABElectronics_Win10IOT_Libraries;
+using System.Threading;
 #endregion
 
 namespace UI_Brewer.Model
@@ -37,6 +38,18 @@ namespace UI_Brewer.Model
 
         private static GpioController gpio;
         private static GpioPin pin;
+        private static ADCPi adc;
+
+        private static double channel1_value = 0;
+        private static double channel2_value = 0;
+        private static double channel3_value = 0;
+        private static double channel4_value = 0;
+        private static double channel5_value = 0;
+        private static double channel6_value = 0;
+        private static double channel7_value = 0;
+        private static double channel8_value = 0;
+        private static int TIME_INTERVAL_IN_MILLISECONDS = 10;
+        private static Timer _timer;
 
         // Values shared with view controller
         public static bool heaterOn { get; private set; }
@@ -45,6 +58,26 @@ namespace UI_Brewer.Model
         #endregion
 
         #region Inits
+
+        public Brewer(int setTemp)
+        {
+            userSetPower = false;
+
+            this.setTemp = setTemp;
+            this.curTemp = 0;
+
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(100);
+            timer.Tick += updateTemp;
+            timer.Start();
+
+            timer2 = new DispatcherTimer();
+            timer2.Interval = TimeSpan.FromMilliseconds(TIME_INTERVAL_IN_MILLISECONDS);
+            timer2.Tick += pwmHeater;
+            timer2.Start();
+
+        }
+
         public static void initGpio()        
         {
             Debug.WriteLine("Init Gpio");
@@ -59,22 +92,65 @@ namespace UI_Brewer.Model
             }
         }
 
-        public Brewer(int setTemp)
+        public static void initADC()
         {
-            userSetPower = false;
-            
-            this.setTemp = setTemp;
-            this.curTemp = 0;
+            adc = new ADCPi();
+            Connect_ADC();
+        }
+        #endregion
 
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(100);
-            timer.Tick += updateTemp;
-            timer.Start();
+        #region ADC Methods
+        private static async void Connect_ADC()
+        {
+            // when the connect button is clicked update the ADC i2c addresses with the values in the textboxes on the page
+            try
+            {
+                adc.Address1 = Convert.ToByte("68", 16);
+                adc.Address2 = Convert.ToByte("69", 16);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+           
+            // create a Connected event handler and connect to the ADC Pi.
+            adc.Connected += Adc_Connected;
+            await adc.Connect();
+        }
 
-            timer2 = new DispatcherTimer();
-            timer2.Interval = TimeSpan.FromMilliseconds(1);
-            timer2.Tick += pwmHeater;
-            timer2.Start();
+        private static void Adc_Connected(object sender, EventArgs e)
+        {
+            // The ADC Pi is connected
+
+            // set the initial bit rate to 16
+            adc.SetBitRate(16);
+
+            // set the gain to 1
+            adc.SetPGA(1);
+
+
+            // set the startTime to be now and start the timer
+            //startTime = DateTime.Now;
+            _timer = new Timer(ReadADC, null, TIME_INTERVAL_IN_MILLISECONDS, Timeout.Infinite);
+
+        }
+
+        private static void ReadADC(Object sender)
+        {
+
+                // get the voltage values from all 8 ADC channels
+                channel1_value = adc.ReadVoltage(1);
+                channel2_value = adc.ReadVoltage(2);
+                channel3_value = adc.ReadVoltage(3);
+                channel4_value = adc.ReadVoltage(4);
+                channel5_value = adc.ReadVoltage(5);
+                channel6_value = adc.ReadVoltage(6);
+                channel7_value = adc.ReadVoltage(7);
+                channel8_value = adc.ReadVoltage(8);
+
+
+                // reset the timer so it will run again after the preset period
+                _timer.Change(TIME_INTERVAL_IN_MILLISECONDS, Timeout.Infinite);
             
         }
         #endregion

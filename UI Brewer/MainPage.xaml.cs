@@ -123,11 +123,14 @@ namespace UI_Brewer
 
     public class ViewModel : INotifyPropertyChanged
     {
+        private int counter;
+
         private Brewer brewerObject;
         private BrewingTimer timData;
         private DispatcherTimer timer;
         public ViewModel()
         {
+            counter = 0;
             if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
             { 
                 PowerA = 180;
@@ -151,11 +154,18 @@ namespace UI_Brewer
         }
         public void updateTemp(object sender, object e)
         {
+            counter++;
             Temp = (int) Math.Round(brewerObject.getCurTemp());
             TempA = brewerObject.getCurTemp() * 3.4;
             Power = (int)Math.Round(brewerObject.getPower());
             PowerA = brewerObject.getPower() * 3.6;
-            Heater = Brewer.heaterOn;
+            if (counter > Power)
+            {
+                Heater = false;
+            }
+            else {Heater = true;}
+
+            if (counter > 100) { counter = 0; }
             
             if (Brewer.tempReached())
             {                
