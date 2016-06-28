@@ -14,11 +14,11 @@ namespace UI_Brewer.Model
         #region Vars
         private int totTime;
         private List<int> intTime = new List<int>();
-        //private double curTime;
+        private List<int> allIntTimes = new List<int>();
         private static double totTimeRem = 0;
         private double intTimeRem;
         private Stopwatch stopwatch;
-        //private MainPage mp;
+        private int addTime;
         #endregion
 
         #region Inits
@@ -72,6 +72,7 @@ namespace UI_Brewer.Model
                 {
                     if (this.intTime.Count >= 1)
                     {
+                        addTime = intTime.Max();
                         // inn here interval time reached
                         if (intTime.Count > 1)
                             intTime.Remove(intTime.Max());
@@ -102,18 +103,34 @@ namespace UI_Brewer.Model
         public void setIntTime(int intTime)
         {
             this.intTime.Add(intTime);
+            allIntTimes.Add(intTime);
             intTimeRem = this.intTime.Max();
 
-            Debug.WriteLine("Int times: ");
+            Debug.Write("Int times: ");
             for (int i = 0; i < this.intTime.Count; i++)
             {
                 Debug.Write(this.intTime.ElementAt(i) + ", ");
             }
+            Debug.WriteLine("");
         }
         public static bool StillCounting()
         {
             return totTimeRem > 0;
         } 
+        public int getAddTime()
+        {
+            var temp = 500.0;
+            var ret = 0;
+            for (int i = 0; i < allIntTimes.Count; i++)
+            {
+                if (Math.Abs(allIntTimes.ElementAt(i)- TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes) < temp)
+                {
+                    temp = Math.Abs(allIntTimes.ElementAt(i) - TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes);
+                    ret = (int) Math.Abs(allIntTimes.ElementAt(i));
+                }
+            }                  
+            return ret;
+        }
     }
 }
 #endregion

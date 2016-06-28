@@ -99,6 +99,7 @@ namespace UI_Brewer
                 case Quadrants.se: _Value = 090 - _Value; break;
                 case Quadrants.sw: _Value = 270 + _Value; break;
             }
+            _Value = Math.Min(Math.Max(0, _Value), 360);
             return _Value;
         }
 
@@ -110,7 +111,7 @@ namespace UI_Brewer
         {
             //Debug.WriteLine("user entering power");
             Brewer.userSetPower = true;
-            setPower.Visibility = Visibility.Visible;
+            setPower.Visibility = Visibility.Collapsed;
         }
 
         private void powerDtapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -170,10 +171,11 @@ namespace UI_Brewer
             if (Brewer.tempReached())
             {                
                 SetTotTimeA = timData.getRemTimeRem() * 3;
-                SetTotTime = (int)(timData.getRemTimeRem());
+                SetTotTime = (int)Math.Round((timData.getRemTimeRem()));
                 //System.Diagnostics.Debug.WriteLine("Time remaning angel = " + SetTotTimeA + " Time remaning = " + SetTotTime);
                 SetIntTimeA = timData.getIntTimeRem() * 3;
-                SetIntTime = (int)(timData.getIntTimeRem());
+                SetIntTime = (int)Math.Round((timData.getIntTimeRem()));
+                ReadIntTime = SetTotTime - timData.getAddTime();
                 
             }
 
@@ -290,6 +292,9 @@ namespace UI_Brewer
         }
         int m_setIntTime = default(int);
         public int SetIntTime { get { return m_setIntTime; } private set { SetProperty(ref m_setIntTime, value); } }
+
+        int m_readIntTime = default(int);
+        public int ReadIntTime { get { return m_readIntTime; } private set { SetProperty(ref m_readIntTime, value); } }
 
         double m_setIntTimetemp = default(double);
         public double SetIntTimetemp

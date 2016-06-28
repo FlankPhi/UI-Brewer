@@ -99,6 +99,7 @@
     <Compile Include="Controlls\SimpleGauge.cs" />
     <Compile Include="Converters\FromStateToColor.cs" />
     <Compile Include="Converters\NegativConverter.cs" />
+    <Compile Include="Converters\ValueToColor.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -145,6 +146,9 @@
     <Reference Include="ABElectronics_Win10IOT_Libraries">
       <HintPath>..\..\..\..\..\..\Downloads\ABElectronics_Win10IOT_Libraries-master\ABElectronics_Win10IOT_Libraries-master\ABElectronics_Win10IOT_Libraries\bin\ARM\Debug\ABElectronics_Win10IOT_Libraries.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Sensors\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -37,7 +37,8 @@ namespace UI_Brewer.Model
         private int counter = 0;
 
         private static GpioController gpio;
-        private static GpioPin pin;
+        private static GpioPin heaterPin;
+        private static GpioPin indicatorPin;
         private static ADCPi adc;
 
         private static double channel1_value = 0;
@@ -85,10 +86,16 @@ namespace UI_Brewer.Model
             
             if (gpio != null)
             {
-                pin = gpio.OpenPin(26);
-                Debug.WriteLine("Init OK");                           
-                pin.SetDriveMode(GpioPinDriveMode.Output);
-                pin.Write(GpioPinValue.Low);
+                heaterPin = gpio.OpenPin(26);
+                indicatorPin = gpio.OpenPin(13);
+                                          
+                heaterPin.SetDriveMode(GpioPinDriveMode.Output);
+                indicatorPin.SetDriveMode(GpioPinDriveMode.Output);
+
+                heaterPin.Write(GpioPinValue.Low);
+                indicatorPin.Write(GpioPinValue.Low);
+
+                Debug.WriteLine("Init OK");
             }
         }
 
@@ -175,30 +182,34 @@ namespace UI_Brewer.Model
                     if (modu > 0 && heaterOn)
                     {
                         // Debug.WriteLine("setting led low " + u + " modu " + modu);
-                        pin.Write(GpioPinValue.Low);
+                        heaterPin.Write(GpioPinValue.Low);
+                        indicatorPin.Write(GpioPinValue.Low);
                         heaterOn = false;
                     }
                     else if (modu <= 0 && !heaterOn)
                     {
                         // Debug.WriteLine("setting led high " + u + " modu " + modu);
-                        pin.Write(GpioPinValue.High);
+                        heaterPin.Write(GpioPinValue.High);
+                        indicatorPin.Write(GpioPinValue.High);
                         heaterOn = true;
                     }
                     else
                     {
-                        // pin is in correct state; do nothing
+                        // heaterPin is in correct state; do nothing
                     }
                 }
 
                 else
-                {   // Cykle finnished sett pin low for safty issues
+                {   // Cykle finnished sett heaterPin low for safty issues
                     counter = 0;
-                    pin.Write(GpioPinValue.Low);
+                    heaterPin.Write(GpioPinValue.Low);
+                    indicatorPin.Write(GpioPinValue.Low);
                     heaterOn = false;
                 }
             }else if (heaterOn)
             {                
-                pin.Write(GpioPinValue.Low);
+                heaterPin.Write(GpioPinValue.Low);
+                indicatorPin.Write(GpioPinValue.Low);
             }
         }
         // part of simulator
@@ -218,10 +229,11 @@ namespace UI_Brewer.Model
                     u = p + (i * Kp);
                     u = Math.Max(Math.Min(100, u), 0);  // Min value 0 Max value 100
                 }
-                // Change in temp 
+                // Change in temp (Simulated data remp region 0-105)
                 var dTemp = u * (PMAX / (double)(CP * M));
                 var tempDiff = 20 - curTemp;
                 curTemp += (dTemp + (0.2 * tempDiff));
+                curTemp = Math.Min(Math.Max(curTemp, 0), 102);
                 if (Math.Abs(curTemp - setTemp) < 1)
                 {
                     ready = true;

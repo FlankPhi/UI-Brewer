@@ -11,6 +11,7 @@
     mc:Ignorable="d">
 
     <Page.Resources>
+        <Converters:ValueToColor x:Key="ValueToColor"/>
         <Common:NegativConverter x:Key="NegativConverter"/>
         <Converters:FromStateToColor x:Key="FromStateToColor"/>
     </Page.Resources>
@@ -110,6 +111,14 @@
 					<Run Text="Interv"/><LineBreak/>
 					<Run Foreground="White" Text="{Binding SetIntTime}"/>
 					<Run Text=" m"/><LineBreak/>
+                </TextBlock>
+            </Grid>
+            <Grid Margin="282,565,213,322">
+                <Ellipse Fill="{Binding ReadIntTime, Converter={StaticResource ValueToColor}}" HorizontalAlignment="Left" Height="30" Stroke="Black" VerticalAlignment="Top" Width="30" RenderTransformOrigin="-0.811,0.444" Margin="0,18,0,0"/>
+                <TextBlock x:Name="textBlockTime" HorizontalAlignment="Left"  TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="176" FontSize="25" Foreground="#FFF6E1E1" TextAlignment="Center" Margin="35,0,0,0">
+                	<Run Foreground="Gray" Text="Add Time "/><LineBreak/>
+                	<Run Foreground="White" Text="{Binding ReadIntTime}"/>
+                	<Run Foreground="Gray" Text="m"/>
                 </TextBlock>
             </Grid>
         </Grid>
@@ -240,7 +249,15 @@
 					<Run Text="°C"/><LineBreak/>
                 </TextBlock>
             </Grid>
-            <Ellipse Fill="{Binding Heater, Converter={StaticResource FromStateToColor}}" HorizontalAlignment="Left" Height="100" Margin="663,554,-48,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
+            <Ellipse Fill="{Binding Heater, Converter={StaticResource FromStateToColor}}" HorizontalAlignment="Left" Height="100" Margin="663,553,-48,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
+            <Grid Margin="282,565,287,322">
+                <Ellipse Fill="#FFB4E120" HorizontalAlignment="Left" Height="30" Stroke="Black" VerticalAlignment="Top" Width="30" RenderTransformOrigin="-0.811,0.444" Margin="0,18,0,0"/>
+                <TextBlock x:Name="textBlock" HorizontalAlignment="Center"  TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="84" FontSize="25" Foreground="#FFF6E1E1" TextAlignment="Center">
+                	<Run Foreground="Gray" Text="Power "/><LineBreak/>
+                	<Run Foreground="White" Text="{Binding Power}"/>
+                	<Run Foreground="Gray" Text="%"/>
+                </TextBlock>
+            </Grid>
 
         </Grid>
     </Grid>
