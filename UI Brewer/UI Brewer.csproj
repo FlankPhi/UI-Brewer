@@ -97,6 +97,7 @@
     </Compile>
     <Compile Include="Controlls\RingSlice.cs" />
     <Compile Include="Controlls\SimpleGauge.cs" />
+    <Compile Include="Converters\BoolToVisibility.cs" />
     <Compile Include="Converters\FromStateToColor.cs" />
     <Compile Include="Converters\NegativConverter.cs" />
     <Compile Include="Converters\ValueToColor.cs" />

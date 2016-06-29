@@ -60,7 +60,7 @@ namespace UI_Brewer.Model
 
         #region Inits
 
-        public Brewer(int setTemp)
+        public Brewer()
         {
             userSetPower = false;
 

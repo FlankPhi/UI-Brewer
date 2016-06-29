@@ -15,13 +15,13 @@ namespace UI_Brewer.Converters
         {
             SolidColorBrush retColor = new SolidColorBrush();
             retColor.Color = Windows.UI.Colors.Red;
-            if (Math.Abs((int)value) <= 1)
+            if (Math.Abs((int)value) <= 30)
             {
                 retColor.Color = Windows.UI.Colors.LawnGreen;
             }
-            else if (Math.Abs((int)value) <= 2)
+            else if (Math.Abs((int)value) <= 100)
             {
-                retColor.Color = Windows.UI.Colors.YellowGreen;
+                retColor.Color = Windows.UI.Colors.Yellow;
             }else
             {
                 retColor.Color = Windows.UI.Colors.Red;

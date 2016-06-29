@@ -11,6 +11,7 @@
     mc:Ignorable="d">
 
     <Page.Resources>
+        <Converters:BoolToVisibility x:Key="BoolToVisibility"/>
         <Converters:ValueToColor x:Key="ValueToColor"/>
         <Common:NegativConverter x:Key="NegativConverter"/>
         <Converters:FromStateToColor x:Key="FromStateToColor"/>
@@ -24,8 +25,11 @@
 
     <Grid Background="{ThemeResource AppBarItemForegroundThemeBrush}">
         <!-- Timing Grid -->
-        <Grid HorizontalAlignment="Right" Height="960"  VerticalAlignment="Top" Width="706">
+        <Grid HorizontalAlignment="Right" Height="960"  VerticalAlignment="Top" Width="706" Margin="0,0,0,-240">
             <Grid x:Name="Time"  VerticalAlignment="Top" HorizontalAlignment="Center">
+
+
+                <!-- Ring 2 Total time count down-->
 
 
                 <!-- Ring 2 Total time count down-->
@@ -67,7 +71,6 @@
 
                 <!-- Ring 3 For setting interval times and count down interval times-->
                 <Grid Width="400" Height="400" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <MediaElement x:Name="MyMediaElement" AutoPlay="True" Volume="0.5" AudioCategory="SoundEffects" />
                     <!-- Ring -->
                     <my:RingSlice InnerRadius="100" Radius="150" StartAngle="0" EndAngle="{Binding SetIntTimeA}" >
                         <my:RingSlice.Fill>
@@ -107,18 +110,23 @@
                     </TextBlock.RenderTransform>  
 					<Run Text="Total"/><LineBreak/>
 					<Run Foreground="White" Text="{Binding SetTotTime}"/>
-					<Run Text=" m"/><LineBreak/>   
+					<Run Text="{Binding SetTotTimeS}"/><LineBreak/>   
 					<Run Text="Interv"/><LineBreak/>
 					<Run Foreground="White" Text="{Binding SetIntTime}"/>
-					<Run Text=" m"/><LineBreak/>
+					<Run Text="{Binding SetIntTimeS}"/><LineBreak/>
                 </TextBlock>
             </Grid>
-            <Grid Margin="282,565,213,322">
-                <Ellipse Fill="{Binding ReadIntTime, Converter={StaticResource ValueToColor}}" HorizontalAlignment="Left" Height="30" Stroke="Black" VerticalAlignment="Top" Width="30" RenderTransformOrigin="-0.811,0.444" Margin="0,18,0,0"/>
-                <TextBlock x:Name="textBlockTime" HorizontalAlignment="Left"  TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="176" FontSize="25" Foreground="#FFF6E1E1" TextAlignment="Center" Margin="35,0,0,0">
-                	<Run Foreground="Gray" Text="Add Time "/><LineBreak/>
+            <Grid Margin="0,566,0,322" RenderTransformOrigin="0.5,0.5">
+                <Ellipse Fill="{Binding ReadIntTimeMin, Converter={StaticResource ValueToColor}}" HorizontalAlignment="Left" Height="30" Stroke="Black" VerticalAlignment="Top" Width="30" Margin="253,20,0,0" Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}"/>
+                <TextBlock x:Name="textBlockTime"  TextWrapping="Wrap" VerticalAlignment="Top" Height="72" FontSize="25" Foreground="#FFF6E1E1" TextAlignment="Center" Margin="35,0,0,0" HorizontalAlignment="Center" Width="176" Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}">
+                	<Run Foreground="Gray" Text="Add Inn "/><LineBreak/>
                 	<Run Foreground="White" Text="{Binding ReadIntTime}"/>
-                	<Run Foreground="Gray" Text="m"/>
+                	<Run Foreground="Gray" Text="{Binding ReadIntTimeS}"/>
+                </TextBlock>
+                <TextBlock x:Name="textBlockTimeConst" HorizontalAlignment="Left"  TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="155" FontSize="25" Foreground="#FFF6E1E1" TextAlignment="Center" Margin="459,0,0,0" Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}">
+                	<Run Foreground="Gray" Text="Add Time "/><LineBreak/>
+                	<Run Foreground="White" Text="{Binding ReadIntTimeCon}"/>
+                	<Run Foreground="Gray" Text=" m"/>
                 </TextBlock>
             </Grid>
         </Grid>
@@ -249,10 +257,9 @@
 					<Run Text="°C"/><LineBreak/>
                 </TextBlock>
             </Grid>
-            <Ellipse Fill="{Binding Heater, Converter={StaticResource FromStateToColor}}" HorizontalAlignment="Left" Height="100" Margin="663,553,-48,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
             <Grid Margin="282,565,287,322">
-                <Ellipse Fill="#FFB4E120" HorizontalAlignment="Left" Height="30" Stroke="Black" VerticalAlignment="Top" Width="30" RenderTransformOrigin="-0.811,0.444" Margin="0,18,0,0"/>
-                <TextBlock x:Name="textBlock" HorizontalAlignment="Center"  TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="84" FontSize="25" Foreground="#FFF6E1E1" TextAlignment="Center">
+                <Ellipse Name="UserPow" Fill="#FFB4E120" HorizontalAlignment="Left" Height="30" Stroke="Black" VerticalAlignment="Top" Width="30" RenderTransformOrigin="-0.811,0.444" Margin="0,18,0,0"/>
+                <TextBlock x:Name="UserPowTxt" HorizontalAlignment="Center"  TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="84" FontSize="25" Foreground="#FFF6E1E1" TextAlignment="Center">
                 	<Run Foreground="Gray" Text="Power "/><LineBreak/>
                 	<Run Foreground="White" Text="{Binding Power}"/>
                 	<Run Foreground="Gray" Text="%"/>

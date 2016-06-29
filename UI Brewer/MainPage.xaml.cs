@@ -18,20 +18,11 @@ namespace UI_Brewer
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private const string bellSound = "/Assets/Bell.wav";
-        // private bool intTimeSoundPlayed = true;
+
         public MainPage()
         {
             InitializeComponent();
-            Brewer.initGpio();
-            // Statup soundplayed
-            MyMediaElement.Source = new Uri(BaseUri, bellSound);            
-        }
-
-        public void playSound(string file)
-        {
-            //MyMediaElement.Source = new Uri(BaseUri, file);
-
+            Brewer.initGpio();         
         }
 
         #region touchEvents
@@ -61,7 +52,7 @@ namespace UI_Brewer
             var grid = sender as Grid;
             var angle = GetAngle(e.Position, grid.RenderSize);
             (this.DataContext as ViewModel).SetTotTime = (int)(angle/3d);
-            (this.DataContext as ViewModel).SetTotTimetemp = angle;
+            (this.DataContext as ViewModel).SetTotTimetemp = (int)(angle / 3d);
             (this.DataContext as ViewModel).SetTotTimeA = angle;
 
         }
@@ -109,16 +100,16 @@ namespace UI_Brewer
 
         private void clickDown(object sender, PointerRoutedEventArgs e)
         {
-            //Debug.WriteLine("user entering power");
             Brewer.userSetPower = true;
-            setPower.Visibility = Visibility.Collapsed;
+            UserPow.Visibility = Visibility.Visible;
+            UserPowTxt.Visibility = Visibility.Visible;
         }
 
         private void powerDtapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            //Debug.WriteLine("user stoped entering power");
             Brewer.userSetPower = false;
-            setPower.Visibility = Visibility.Collapsed;
+            UserPow.Visibility = Visibility.Collapsed;
+            UserPowTxt.Visibility = Visibility.Collapsed;
         }
     }
 
@@ -129,6 +120,7 @@ namespace UI_Brewer
         private Brewer brewerObject;
         private BrewingTimer timData;
         private DispatcherTimer timer;
+
         public ViewModel()
         {
             counter = 0;
@@ -137,22 +129,22 @@ namespace UI_Brewer
                 PowerA = 180;
                 TempA = 180;
                 SetTempA = 180;
-                Heater = false;
             }
             timData = new BrewingTimer();
-            //timData.startTotTime(20000);
-            brewerObject = new Brewer(60);
-            Temp = 60;
+            brewerObject = new Brewer();
+            Temp = 0;
+
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(100);
             timer.Tick += updateTemp;
             timer.Start();
-
         }
+
         public void updateTime(int time)
         {
             timData.setTotTime(time);
         }
+
         public void updateTemp(object sender, object e)
         {
             counter++;
@@ -160,23 +152,50 @@ namespace UI_Brewer
             TempA = brewerObject.getCurTemp() * 3.4;
             Power = (int)Math.Round(brewerObject.getPower());
             PowerA = brewerObject.getPower() * 3.6;
-            if (counter > Power)
-            {
-                Heater = false;
-            }
-            else {Heater = true;}
-
-            if (counter > 100) { counter = 0; }
             
             if (Brewer.tempReached())
-            {                
+            {            
                 SetTotTimeA = timData.getRemTimeRem() * 3;
-                SetTotTime = (int)Math.Round((timData.getRemTimeRem()));
-                //System.Diagnostics.Debug.WriteLine("Time remaning angel = " + SetTotTimeA + " Time remaning = " + SetTotTime);
-                SetIntTimeA = timData.getIntTimeRem() * 3;
-                SetIntTime = (int)Math.Round((timData.getIntTimeRem()));
-                ReadIntTime = SetTotTime - timData.getAddTime();
+                SetTotTime = (int)timData.getRemTimeRem();                
+                if (SetTotTime <= 1)
+                {
+                    SetTotTime = (int)TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds;
+                    SetTotTimeS = " s";
+                    ReadIntTime = SetTotTime - (int)TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds;
+                }
+                else
+                {
+                    ReadIntTime = SetTotTime - timData.getAddTime();
+                    SetTotTimeS = " m";
+                }
                 
+                SetIntTimeA = timData.getIntTimeRem() * 3;
+                SetIntTime = (int)timData.getIntTimeRem();
+
+                if (SetIntTime <= 1)
+                {
+                    SetIntTime = (int)TimeSpan.FromMinutes(timData.getIntTimeRem()).TotalSeconds;
+                    SetIntTimeS = " s";
+                }else
+                {
+                    SetIntTimeS = " m";
+                }
+
+                
+                ReadIntTimeMin = (int) timData.getAddTime();
+                ReadIntTimeCon = timData.getAddTime();
+
+                if (Math.Abs(ReadIntTime) <= 1)
+                {
+                    ReadIntTime =
+                        (int)TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds
+                        - (int)TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds;
+                    ReadIntTimeS = " s";
+                }
+                else
+                {
+                    ReadIntTimeS = " m";
+                }
             }
 
 
@@ -186,15 +205,6 @@ namespace UI_Brewer
 
         #region Angels & Values
         
-        bool m_Heater = default(bool);
-        public bool Heater
-        {
-            get { return m_Heater; }
-            set
-            {
-                SetProperty(ref m_Heater, value);
-            }
-        }
         #region Temperature
         // 1-Ring
         double m_powerA = default(double);
@@ -266,16 +276,23 @@ namespace UI_Brewer
             }
         }
         int m_setTotTime = default(int);
-        public int SetTotTime { get { return m_setTotTime; } set { SetProperty(ref m_setTotTime, value); } }
+        public int SetTotTime { get { return m_setTotTime; }
+            set {
+                SetProperty(ref m_setTotTime, value);
+            } }
 
-        double m_setTotTimetemp = default(double);
-        public double SetTotTimetemp
+        string m_setTotTimeS = default(string);
+        public string SetTotTimeS { get { return m_setTotTimeS; } set { SetProperty(ref m_setTotTimeS, value); } }
+
+        // Temp parameter for setting tottime only when user manipulats the value (do not remove)
+        int m_setTotTimetemp = default(int);
+        public int SetTotTimetemp
         {
             get { return m_setTotTimetemp; }
             set
             {
-                timData.setTotTime((int)(value/3d));
-                SetProperty(ref m_setTotTimetemp, value);  
+                timData.setTotTime(value);
+                SetProperty(ref m_setTotTimetemp, value);
             }
         }
 
@@ -293,8 +310,21 @@ namespace UI_Brewer
         int m_setIntTime = default(int);
         public int SetIntTime { get { return m_setIntTime; } private set { SetProperty(ref m_setIntTime, value); } }
 
+        string m_setIntTimeS = default(string);
+        public string SetIntTimeS { get { return m_setIntTimeS; } private set { SetProperty(ref m_setIntTimeS, value); } }
+
+        // Nearest Interval time
         int m_readIntTime = default(int);
         public int ReadIntTime { get { return m_readIntTime; } private set { SetProperty(ref m_readIntTime, value); } }
+
+        string m_readIntTimeS = default(string);
+        public string ReadIntTimeS { get { return m_readIntTimeS; } private set { SetProperty(ref m_readIntTimeS, value); } }
+
+        int m_readIntTimeMin = default(int);
+        public int ReadIntTimeMin { get { return m_readIntTimeMin; } private set { SetProperty(ref m_readIntTimeMin, value); } }
+
+        int m_readIntTimeCon = default(int);
+        public int ReadIntTimeCon { get { return m_readIntTimeCon; } private set { SetProperty(ref m_readIntTimeCon, value); } }
 
         double m_setIntTimetemp = default(double);
         public double SetIntTimetemp
@@ -302,10 +332,13 @@ namespace UI_Brewer
             get { return m_setIntTimetemp; }
             set
             {
-                timData.setIntTime((int)(value / 3d));
+                //timData.setIntTime((int)(value / 3d));
                 SetProperty(ref m_setIntTimetemp, value);
             }
         }
+
+        bool m_readIntTimShow = default(bool);
+        public bool ReadIntTimeShow { get { return m_readIntTimShow; } private set { SetProperty(ref m_readIntTimShow, value); } }
         #endregion
 
         #endregion

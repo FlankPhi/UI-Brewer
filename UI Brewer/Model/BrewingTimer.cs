@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Windows.Media.Playback;
+using Windows.Storage;
+
+
 
 
 #endregion
@@ -19,14 +23,38 @@ namespace UI_Brewer.Model
         private double intTimeRem;
         private Stopwatch stopwatch;
         private int addTime;
+
+        // Audio objects
+        MediaPlayer soundEffect;
         #endregion
 
         #region Inits
         public BrewingTimer()
         {
            stopwatch = new Stopwatch();
-           // mp = new MainPage(); 
+            initSound();
+            //soundEffect.AddAudioEffect("player", false,)
+            // mp = new MainPage(); 
+           
         }
+
+        #region Sound
+        private async void  initSound()
+        {
+            Debug.WriteLine("init sound");
+
+            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/Bell.wav"));
+
+            soundEffect = BackgroundMediaPlayer.Current;
+            soundEffect.AutoPlay = false;
+            soundEffect.SetFileSource(file);
+        }
+        public void playSound()
+        {
+            Debug.WriteLine("Playing sound");
+            soundEffect.Play();
+        }
+        #endregion
 
         public void startTotTime(int totTime)
         {
@@ -34,15 +62,6 @@ namespace UI_Brewer.Model
             stopwatch.Start();
         }
         #endregion
-
-        //private void playSound(string path)
-        //{
-        //    System.Media.SoundPlayer player =
-        //        new System.Media.SoundPlayer();
-        //    player.SoundLocation = path;
-        //    player.Load();
-        //    player.Play();
-        //}
 
         #region Getters & Setters
         public double getRemTimeRem()
@@ -75,7 +94,7 @@ namespace UI_Brewer.Model
                         addTime = intTime.Max();
                         // inn here interval time reached
                         if (intTime.Count > 1)
-                            intTime.Remove(intTime.Max());
+                            intTime.Remove(intTime.Max());                        
                         Debug.WriteLine("Interval ellapsed " + TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes);             
                     }
                     
@@ -98,10 +117,12 @@ namespace UI_Brewer.Model
         {
             this.totTime = (int)TimeSpan.FromMinutes(newTime).TotalMilliseconds;
             totTimeRem = this.totTime;
+            //Debug.WriteLine("Tot Time: " + this.totTime + " remTime: " + totTimeRem);
             stopwatch.Reset();
         }
         public void setIntTime(int intTime)
         {
+            playSound();
             this.intTime.Add(intTime);
             allIntTimes.Add(intTime);
             intTimeRem = this.intTime.Max();
