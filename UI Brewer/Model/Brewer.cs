@@ -64,7 +64,7 @@ namespace UI_Brewer.Model
         {
             userSetPower = false;
 
-            this.setTemp = setTemp;
+            this.setTemp = 0;
             this.curTemp = 0;
 
             timer = new DispatcherTimer();
@@ -181,14 +181,12 @@ namespace UI_Brewer.Model
                     
                     if (modu > 0 && heaterOn)
                     {
-                        // Debug.WriteLine("setting led low " + u + " modu " + modu);
                         heaterPin.Write(GpioPinValue.Low);
                         indicatorPin.Write(GpioPinValue.Low);
                         heaterOn = false;
                     }
                     else if (modu <= 0 && !heaterOn)
                     {
-                        // Debug.WriteLine("setting led high " + u + " modu " + modu);
                         heaterPin.Write(GpioPinValue.High);
                         indicatorPin.Write(GpioPinValue.High);
                         heaterOn = true;
@@ -273,6 +271,6 @@ namespace UI_Brewer.Model
         {
             return ready;
         }
+        #endregion
     }
 }
-#endregion

@@ -156,7 +156,7 @@
                         </Ellipse>
                     </Grid>
                     <!-- Touch grid -->
-                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="Grid_ManipulationDelta_2">
+                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangeSetTemperature">
                         <Grid.Clip>
                             <RectangleGeometry Rect="250,50,50,50">
                                 <RectangleGeometry.Transform>
@@ -233,7 +233,7 @@
                         </TextBlock>
                     </Grid>
                     <!-- Touch grid -->
-                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="Grid_ManipulationDelta" PointerPressed="clickDown" DoubleTapped="powerDtapped">
+                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangePowerOutput" PointerPressed="clickDown" DoubleTapped="powerDtapped">
                         <Grid.Clip>
                             <RectangleGeometry Rect="175,50,50,50">
                                 <RectangleGeometry.Transform>
