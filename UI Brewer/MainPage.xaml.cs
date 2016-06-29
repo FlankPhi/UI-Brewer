@@ -18,7 +18,7 @@ namespace UI_Brewer
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private const string bellSound = "/Assets/Bell.wav";
+        private static string bellSound = "/Assets/Bell.wav";
         private bool intTimeSoundPlayed = true;
         public MainPage()
         {
@@ -28,7 +28,7 @@ namespace UI_Brewer
             MyMediaElement.Source = new Uri(BaseUri, bellSound);            
         }
 
-        public void playSound(string file)
+        public static void playSound(string file)
         {
             //MyMediaElement.Source = new Uri(BaseUri, file);
 
