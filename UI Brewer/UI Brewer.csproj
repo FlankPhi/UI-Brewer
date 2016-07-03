@@ -97,13 +97,17 @@
     </Compile>
     <Compile Include="Controlls\RingSlice.cs" />
     <Compile Include="Controlls\SimpleGauge.cs" />
+    <Compile Include="Converters\BoolToVisibility.cs" />
+    <Compile Include="Converters\FromStateToColor.cs" />
     <Compile Include="Converters\NegativConverter.cs" />
+    <Compile Include="Converters\ValueToColor.cs" />
+    <Compile Include="Logg\Logger.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\BrewingTimer.cs" />
+    <Compile Include="Model\Brewer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimulatedData\Simulator.cs" />
-    <Compile Include="SimulatedData\BrewingTimer.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -139,6 +143,14 @@
     <SDKReference Include="WindowsIoT, Version=10.0.10586.0">
       <Name>Windows IoT Extensions for the UWP</Name>
     </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="ABElectronics_Win10IOT_Libraries">
+      <HintPath>..\..\..\..\..\..\Downloads\ABElectronics_Win10IOT_Libraries-master\ABElectronics_Win10IOT_Libraries-master\ABElectronics_Win10IOT_Libraries\bin\ARM\Debug\ABElectronics_Win10IOT_Libraries.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Sensors\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -2,7 +2,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using UI_Brewer.SimulatedData;
+using UI_Brewer.Model;
+using UI_Brewer.Logg;
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -18,24 +19,19 @@ namespace UI_Brewer
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private static string bellSound = "/Assets/Bell.wav";
-        private bool intTimeSoundPlayed = true;
+
         public MainPage()
         {
             InitializeComponent();
-            Simulator.initGpio();
-            // Statup soundplayed
-            MyMediaElement.Source = new Uri(BaseUri, bellSound);            
-        }
-
-        public static void playSound(string file)
-        {
-            //MyMediaElement.Source = new Uri(BaseUri, file);
-
+            Brewer.initGpio();
+            //Logger.run();
+           
+            
         }
 
         #region touchEvents
-        private void Grid_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
+        #region Change Values
+        private void ChangePowerOutput(object sender, ManipulationDeltaRoutedEventArgs e)
         {
             var grid = sender as Grid;
             var angle = GetAngle(e.Position, grid.RenderSize);
@@ -49,7 +45,7 @@ namespace UI_Brewer
             (this.DataContext as ViewModel).TempA = angle;
         }
 
-        private void Grid_ManipulationDelta_2(object sender, ManipulationDeltaRoutedEventArgs e)
+        private void ChangeSetTemperature(object sender, ManipulationDeltaRoutedEventArgs e)
         {
             var grid = sender as Grid;
             var angle = GetAngle(e.Position, grid.RenderSize);
@@ -61,7 +57,7 @@ namespace UI_Brewer
             var grid = sender as Grid;
             var angle = GetAngle(e.Position, grid.RenderSize);
             (this.DataContext as ViewModel).SetTotTime = (int)(angle/3d);
-            (this.DataContext as ViewModel).SetTotTimetemp = angle;
+            (this.DataContext as ViewModel).SetTotTimetemp = (int)(angle / 3d);
             (this.DataContext as ViewModel).SetTotTimeA = angle;
 
         }
@@ -73,12 +69,30 @@ namespace UI_Brewer
           
             //(this.DataContext as ViewModel).SetIntTime = (int) (angle/3d);
         }
+        #endregion
 
+        #region Clik Events
         private void ConfirmIntTime(object sender, PointerRoutedEventArgs e)
         {
             (this.DataContext as ViewModel).SetIntTimetemp = (this.DataContext as ViewModel).SetIntTimeA;
             
         }
+
+        private void clickDown(object sender, PointerRoutedEventArgs e)
+        {
+            Brewer.userSetPower = true;
+            UserPow.Visibility = Visibility.Visible;
+            UserPowTxt.Visibility = Visibility.Visible;
+        }
+
+        private void powerDtapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            Brewer.userSetPower = false;
+            UserPow.Visibility = Visibility.Collapsed;
+            UserPowTxt.Visibility = Visibility.Collapsed;
+        }
+        #endregion
+
         #endregion
 
         #region AngleCalcMethods
@@ -99,22 +113,29 @@ namespace UI_Brewer
                 case Quadrants.se: _Value = 090 - _Value; break;
                 case Quadrants.sw: _Value = 270 + _Value; break;
             }
+            _Value = Math.Min(Math.Max(0, _Value), 360);
             return _Value;
         }
 
+
+
         #endregion
-
-
-
     }
 
     public class ViewModel : INotifyPropertyChanged
     {
-        private Simulator simData;
+        #region Variabels
+        private int counter;
+
+        private Brewer brewerObject;
         private BrewingTimer timData;
         private DispatcherTimer timer;
+        #endregion
+
+        #region init
         public ViewModel()
         {
+            counter = 0;
             if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
             { 
                 PowerA = 180;
@@ -122,42 +143,84 @@ namespace UI_Brewer
                 SetTempA = 180;
             }
             timData = new BrewingTimer();
-            //timData.startTotTime(20000);
-            simData = new Simulator(0);
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(1000);
-            timer.Tick += updateTemp;
-            timer.Start();
+            brewerObject = new Brewer();
+            Temp = 0;
 
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(100);
+            timer.Tick += updateValues;
+            timer.Start();
         }
-        public void updateTime(int time)
+
+        public void setTotTime(int time)
         {
             timData.setTotTime(time);
         }
-        public void updateTemp(object sender, object e)
+        #endregion
+
+        #region Threads
+        public void updateValues(object sender, object e)
         {
-            Temp = (int) Math.Round(simData.getCurTemp());
-            TempA = simData.getCurTemp() * 3.4;
-            Power = (int)Math.Round(simData.getPower());
-            PowerA = simData.getPower() * 3.6;
-            if (Simulator.tempReached())
-            {                
+            counter++;
+            Temp = (int) Math.Round(brewerObject.getCurTemp());
+            TempA = brewerObject.getCurTemp() * 3.4;
+            Power = (int)Math.Round(brewerObject.getPower());
+            PowerA = brewerObject.getPower() * 3.59;
+            ReadIntTimeShow = Brewer.tempReached();
+
+            if (Brewer.tempReached())
+            {            
                 SetTotTimeA = timData.getRemTimeRem() * 3;
-                SetTotTime = (int)(timData.getRemTimeRem());
-                //System.Diagnostics.Debug.WriteLine("Time remaning angel = " + SetTotTimeA + " Time remaning = " + SetTotTime);
-                SetIntTimeA = timData.getIntTimeRem() * 3;
-                SetIntTime = (int)(timData.getIntTimeRem());
+                SetTotTime = (int)timData.getRemTimeRem();                
+                if (SetTotTime <= 1)
+                {
+                    SetTotTime = (int)TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds;
+                    SetTotTimeS = " s";
+                    ReadIntTime = SetTotTime - (int)TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds;
+                }
+                else
+                {
+                    ReadIntTime = SetTotTime - timData.getAddTime();
+                    SetTotTimeS = " m";
+                }
                 
+                SetIntTimeA = timData.getIntTimeRem() * 3;
+                SetIntTime = (int)timData.getIntTimeRem();
+
+                if (SetIntTime <= 1)
+                {
+                    SetIntTime = (int)TimeSpan.FromMinutes(timData.getIntTimeRem()).TotalSeconds;
+                    SetIntTimeS = " s";
+                }else
+                {
+                    SetIntTimeS = " m";
+                }
+
+                
+                ReadIntTimeMin = (int)(TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds 
+                    - TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds); 
+                ReadIntTimeCon = timData.getAddTime();
+
+                if (Math.Abs(ReadIntTime) <= 1)
+                {
+                    ReadIntTime =
+                        (int)TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds
+                        - (int)TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds;
+                    ReadIntTimeS = " s";
+                }
+                else
+                {
+                    ReadIntTimeS = " m";
+                }
             }
-
-
         }
+        #endregion
 
-        #region Dials
-
-        #region Angels & Values
+        #region Variabels for view
 
         #region Temperature
+
+        #region Power
         // 1-Ring
         double m_powerA = default(double);
         public double PowerA
@@ -171,8 +234,16 @@ namespace UI_Brewer
         }
 
         int m_power = default(int);
-        public int Power { get { return m_power; } private set { SetProperty(ref m_power, value); } }
+        public int Power {
+            get { return m_power; }
+            private set {
+                SetProperty(ref m_power, value);
+                brewerObject.setPower(value);
+            }
+        }
+        #endregion
 
+        #region True temperature
         // 2-Ring
         double m_tempA = default(double);
         public double TempA
@@ -192,7 +263,9 @@ namespace UI_Brewer
 
             }
         }
+        #endregion
 
+        #region Set Temperature
         // 3-Ring
         double m_setTempA = default(double);
         public double SetTempA
@@ -203,14 +276,18 @@ namespace UI_Brewer
                 SetProperty(ref m_setTempA, value);
                 SetTemp = (int)Math.Round((value / 3.4d));
                
-                simData.setSetTemp(m_setTemp);
+                brewerObject.setSetTemp(m_setTemp);
             }
         }
         int m_setTemp = default(int);
         public int SetTemp { get { return m_setTemp; } private set { SetProperty(ref m_setTemp, value); } }
         #endregion
 
+        #endregion
+
         #region Timing
+
+        #region Total Time
         // Total Time
         double m_setTotTimeA = default(double);
         public double SetTotTimeA
@@ -222,19 +299,28 @@ namespace UI_Brewer
             }
         }
         int m_setTotTime = default(int);
-        public int SetTotTime { get { return m_setTotTime; } set { SetProperty(ref m_setTotTime, value); } }
+        public int SetTotTime { get { return m_setTotTime; }
+            set {
+                SetProperty(ref m_setTotTime, value);
+            } }
 
-        double m_setTotTimetemp = default(double);
-        public double SetTotTimetemp
+        string m_setTotTimeS = default(string);
+        public string SetTotTimeS { get { return m_setTotTimeS; } set { SetProperty(ref m_setTotTimeS, value); } }
+
+        // Temp parameter for setting tottime only when user manipulats the value (do not remove)
+        int m_setTotTimetemp = default(int);
+        public int SetTotTimetemp
         {
             get { return m_setTotTimetemp; }
             set
             {
-                timData.setTotTime((int)(value/3d));
-                SetProperty(ref m_setTotTimetemp, value);  
+                timData.setTotTime(value);
+                SetProperty(ref m_setTotTimetemp, value);
             }
         }
+        #endregion
 
+        #region Interval Time
         // Intervall Time
         double m_setIntTimeA = default(double);
         public double SetIntTimeA
@@ -249,6 +335,9 @@ namespace UI_Brewer
         int m_setIntTime = default(int);
         public int SetIntTime { get { return m_setIntTime; } private set { SetProperty(ref m_setIntTime, value); } }
 
+        string m_setIntTimeS = default(string);
+        public string SetIntTimeS { get { return m_setIntTimeS; } private set { SetProperty(ref m_setIntTimeS, value); } }
+
         double m_setIntTimetemp = default(double);
         public double SetIntTimetemp
         {
@@ -259,6 +348,26 @@ namespace UI_Brewer
                 SetProperty(ref m_setIntTimetemp, value);
             }
         }
+        #endregion
+
+        #region Closest interval time
+        // Nearest Interval time
+        int m_readIntTime = default(int);
+        public int ReadIntTime { get { return m_readIntTime; } private set { SetProperty(ref m_readIntTime, value); } }
+
+        string m_readIntTimeS = default(string);
+        public string ReadIntTimeS { get { return m_readIntTimeS; } private set { SetProperty(ref m_readIntTimeS, value); } }
+
+        int m_readIntTimeMin = default(int);
+        public int ReadIntTimeMin { get { return m_readIntTimeMin; } private set { SetProperty(ref m_readIntTimeMin, value); } }
+
+        int m_readIntTimeCon = default(int);
+        public int ReadIntTimeCon { get { return m_readIntTimeCon; } private set { SetProperty(ref m_readIntTimeCon, value); } }
+
+        bool m_readIntTimShow = default(bool);
+        public bool ReadIntTimeShow { get { return m_readIntTimShow; } private set { SetProperty(ref m_readIntTimShow, value); } }
+        #endregion
+
         #endregion
 
         #endregion
@@ -284,5 +393,4 @@ namespace UI_Brewer
         }
         #endregion
     }
-    #endregion
 }

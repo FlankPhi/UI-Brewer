@@ -3,29 +3,33 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-
-
+using Windows.Media.Playback;
+using Windows.Storage;
 #endregion
 
-namespace UI_Brewer.SimulatedData
+namespace UI_Brewer.Model
 {
     class BrewingTimer
     {
         #region Vars
         private int totTime;
         private List<int> intTime = new List<int>();
-        private double curTime;
+        private List<int> allIntTimes = new List<int>();
         private static double totTimeRem = 0;
         private double intTimeRem;
         private Stopwatch stopwatch;
-        //private MainPage mp;
+        private int addTime;
+
+        // Audio objects
+        MediaPlayer soundEffect;
+        private bool soundPlayed = false;
         #endregion
 
         #region Inits
         public BrewingTimer()
         {
-           stopwatch = new Stopwatch();
-           // mp = new MainPage(); 
+            stopwatch = new Stopwatch();
+            initSound();
         }
 
         public void startTotTime(int totTime)
@@ -35,21 +39,31 @@ namespace UI_Brewer.SimulatedData
         }
         #endregion
 
-        //private void playSound(string path)
-        //{
-        //    System.Media.SoundPlayer player =
-        //        new System.Media.SoundPlayer();
-        //    player.SoundLocation = path;
-        //    player.Load();
-        //    player.Play();
-        //}
+        #region Sound
+        private async void initSound()
+        {
+            Debug.WriteLine("init sound");
+
+            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(
+                new Uri("ms-appx:///Assets/Bell.wav"));
+
+            soundEffect = BackgroundMediaPlayer.Current;
+            soundEffect.AutoPlay = false;
+            soundEffect.SetFileSource(file);
+        }
+        public void playSound()
+        {
+            Debug.WriteLine("Playing sound");
+            soundEffect.Play();
+        }
+        #endregion
 
         #region Getters & Setters
         public double getRemTimeRem()
         {
             if (stopwatch.IsRunning)
-            {                
-                totTimeRem = totTime - (int) stopwatch.ElapsedMilliseconds;             
+            {
+                totTimeRem = totTime - (int)stopwatch.ElapsedMilliseconds;
                 if (totTimeRem < 0)
                 {
                     totTimeRem = 0;
@@ -58,7 +72,7 @@ namespace UI_Brewer.SimulatedData
                 }
                 return TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes;
             }
-            else if (Simulator.tempReached())
+            else if (Brewer.tempReached())
             {
                 stopwatch.Start();
             }
@@ -67,17 +81,23 @@ namespace UI_Brewer.SimulatedData
         public double getIntTimeRem()
         {
             if (stopwatch.IsRunning && intTime.Count > 0)
-            {                
+            {
                 if (TimeSpan.FromMinutes(intTime.Max()).TotalMilliseconds > totTimeRem)
                 {
-                    if (this.intTime.Count >= 1)
+
+                    // inn here interval time reached
+                    if (intTime.Count > 1)
                     {
-                        // inn here interval time reached
-                        if (intTime.Count > 1)
-                            intTime.Remove(intTime.Max());
-                        Debug.WriteLine("Interval ellapsed " + TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes);             
+                        intTime.Remove(intTime.Max());
+                        soundPlayed = false;
                     }
-                    
+
+                    if (!soundPlayed)
+                    {
+                        playSound();
+                        soundPlayed = true;
+                        Debug.WriteLine("Interval ellapsed " + TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes);
+                    }
                 }
                 if (intTimeRem > 0)
                 {
@@ -87,9 +107,9 @@ namespace UI_Brewer.SimulatedData
                 {
                     intTimeRem = 0;
                 }
-                    return TimeSpan.FromMilliseconds(intTimeRem).TotalMinutes;
-                }
-            
+                return TimeSpan.FromMilliseconds(intTimeRem).TotalMinutes;
+            }
+
             return TimeSpan.FromMilliseconds(intTimeRem).TotalMinutes;
         }
 
@@ -99,21 +119,40 @@ namespace UI_Brewer.SimulatedData
             totTimeRem = this.totTime;
             stopwatch.Reset();
         }
+
         public void setIntTime(int intTime)
         {
             this.intTime.Add(intTime);
+            allIntTimes.Add(intTime);
             intTimeRem = this.intTime.Max();
 
-            Debug.WriteLine("Int times: ");
+            Debug.Write("Int times: ");
             for (int i = 0; i < this.intTime.Count; i++)
             {
                 Debug.Write(this.intTime.ElementAt(i) + ", ");
             }
+            Debug.WriteLine("");
         }
+
         public static bool StillCounting()
         {
             return totTimeRem > 0;
-        } 
+        }
+
+        public int getAddTime()
+        {
+            var temp = 500.0;
+            var ret = 0;
+            for (int i = 0; i < allIntTimes.Count; i++)
+            {
+                if (Math.Abs(allIntTimes.ElementAt(i) - TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes) < temp)
+                {
+                    temp = Math.Abs(allIntTimes.ElementAt(i) - TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes);
+                    ret = (int)Math.Abs(allIntTimes.ElementAt(i));
+                }
+            }
+            return ret;
+        }
+        #endregion
     }
 }
-#endregion
