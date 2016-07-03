@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UI_Brewer.Model;
+using UI_Brewer.Logg;
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -22,7 +23,10 @@ namespace UI_Brewer
         public MainPage()
         {
             InitializeComponent();
-            Brewer.initGpio();         
+            Brewer.initGpio();
+            //Logger.run();
+           
+            
         }
 
         #region touchEvents
@@ -161,7 +165,7 @@ namespace UI_Brewer
             Temp = (int) Math.Round(brewerObject.getCurTemp());
             TempA = brewerObject.getCurTemp() * 3.4;
             Power = (int)Math.Round(brewerObject.getPower());
-            PowerA = brewerObject.getPower() * 3.6;
+            PowerA = brewerObject.getPower() * 3.59;
             ReadIntTimeShow = Brewer.tempReached();
 
             if (Brewer.tempReached())

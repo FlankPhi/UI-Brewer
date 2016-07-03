@@ -101,6 +101,7 @@
     <Compile Include="Converters\FromStateToColor.cs" />
     <Compile Include="Converters\NegativConverter.cs" />
     <Compile Include="Converters\ValueToColor.cs" />
+    <Compile Include="Logg\Logger.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

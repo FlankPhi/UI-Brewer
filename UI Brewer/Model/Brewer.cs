@@ -6,6 +6,7 @@ using Windows.UI.Xaml;
 using Windows.Devices.Gpio;
 using ABElectronics_Win10IOT_Libraries;
 using System.Threading;
+using UI_Brewer.Logg;
 #endregion
 
 namespace UI_Brewer.Model
@@ -14,17 +15,17 @@ namespace UI_Brewer.Model
     {
 
         #region Vars
-        private double setTemp;
-        private double curTemp;
-        private double p;
-        private double i;
-        private double u;
+        private static double setTemp;
+        private static double curTemp = 0;
+        private static double p;
+        private static double i;
+        private static double u;
 
         private static bool ready = false;
 
         // PID parameters
-        private const double Kp = .5;
-        private const double Ti = 80;
+        private const double Kp = 5.0;
+        private const double Ti = 2000.0;
 
         // Model parameters (for futre work)
         private const int CP = 4200;
@@ -43,18 +44,37 @@ namespace UI_Brewer.Model
 
         private static double channel1_value = 0;
         private static double channel2_value = 0;
-        private static double channel3_value = 0;
-        private static double channel4_value = 0;
-        private static double channel5_value = 0;
-        private static double channel6_value = 0;
-        private static double channel7_value = 0;
-        private static double channel8_value = 0;
-        private static int TIME_INTERVAL_IN_MILLISECONDS = 10;
+        //private static double channel3_value = 0;
+        //private static double channel4_value = 0;
+        //private static double channel5_value = 0;
+        //private static double channel6_value = 0;
+        //private static double channel7_value = 0;
+        //private static double channel8_value = 0;
+        private static int TIME_INTERVAL_IN_MILLISECONDS = 100;
         private static Timer _timer;
+
+        private static int TIME_INTERVAL_LOGG = 5000;
+        private static Timer _timer2;
+
+        private static double[] ntcValues = new double[] { 3168, 2257, 1632, 1186, 872.8, 646.3, 484.3, 364.3, 277.5,
+            212.3, 164, 127.5, 99.99, 78.77, 62.56, 50, 40.2, 32.48, 26.43, 21.59, 17.75, 14.64,
+            12.15, 10.13, 8.482, 7.129, 6.022, 5.105, 4.345, 3.712, 3.185, 2.741, 2.369 };
+        private static int[] temperatureRange = new int[] {-50, -45, -40, -35, -30, -25, -20, -15, -10, -5,
+            0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110};
+        private const double R = 10;
+        private static double[] temTemp = new double[100];
 
         // Values shared with view controller
         public static bool heaterOn { get; private set; }
         public static bool userSetPower;
+
+        // LOGG
+        private static Stopwatch stopwatch;
+        private static string sSt;
+        private static string sCt;
+        private static string sPw;
+        private static string sSW;
+
 
         #endregion
 
@@ -62,21 +82,27 @@ namespace UI_Brewer.Model
 
         public Brewer()
         {
+            initADC();
+
             userSetPower = false;
 
-            this.setTemp = 0;
-            this.curTemp = 0;
+            setTemp = 0;
+            curTemp = 0;
 
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(100);
+            timer.Interval = TimeSpan.FromMilliseconds(500);
             timer.Tick += updateTemp;
             timer.Start();
 
             timer2 = new DispatcherTimer();
-            timer2.Interval = TimeSpan.FromMilliseconds(TIME_INTERVAL_IN_MILLISECONDS);
+            timer2.Interval = TimeSpan.FromMilliseconds(10);
             timer2.Tick += pwmHeater;
             timer2.Start();
 
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            _timer2 = new Timer(LoggTemps, null, TIME_INTERVAL_LOGG, Timeout.Infinite);
         }
 
         public static void initGpio()        
@@ -145,24 +171,95 @@ namespace UI_Brewer.Model
         private static void ReadADC(Object sender)
         {
 
-                // get the voltage values from all 8 ADC channels
+            // get the voltage values from all 8 ADC channels
+            try
+            {
                 channel1_value = adc.ReadVoltage(1);
                 channel2_value = adc.ReadVoltage(2);
-                channel3_value = adc.ReadVoltage(3);
-                channel4_value = adc.ReadVoltage(4);
-                channel5_value = adc.ReadVoltage(5);
-                channel6_value = adc.ReadVoltage(6);
-                channel7_value = adc.ReadVoltage(7);
-                channel8_value = adc.ReadVoltage(8);
+                if (channel1_value != 0 || channel2_value != 0)
+                    convertADCreadingsToTempature();
+
+            }
+            catch (Exception)
+            {
+                Debug.WriteLine("Fuck");
+            }
 
 
-                // reset the timer so it will run again after the preset period
-                _timer.Change(TIME_INTERVAL_IN_MILLISECONDS, Timeout.Infinite);
-            
+
+            // reset the timer so it will run again after the preset period
+            _timer.Change(TIME_INTERVAL_IN_MILLISECONDS, Timeout.Infinite);
+
+
+        }
+
+        private static void convertADCreadingsToTempature()
+        {
+            //Debug.WriteLine("channel1_value " + channel1_value);
+            //Debug.WriteLine("channel2_value " + channel2_value);
+            curTemp = (channel1_value * 25.5) + 7.4465;
+            double readNTC = ((R * channel2_value) / channel1_value) - R;
+            //Debug.WriteLine("Read NTC " + readNTC);
+            int index = closestIndex(ntcValues,readNTC);
+            //Debug.WriteLine("Index " + index);
+            if (index != 0)
+            {
+                double a = (ntcValues[index] - ntcValues[index - 1]) / 5;
+                //Debug.WriteLine("a " + a);
+                double b = (ntcValues[index] - a * temperatureRange[index]);
+                double avgT = 0;
+                for (int i = 0; i < temTemp.Length - 1; i++)
+                {
+                    temTemp[i] = temTemp[i + 1];
+                    avgT += temTemp[i];
+                }
+                temTemp[49] = (readNTC - b) / a;
+                avgT += temTemp[49];
+
+
+                //Debug.WriteLine("b " + b);
+
+                curTemp = avgT / 49.0;
+                //Debug.WriteLine("Current Temperature " + curTemp);
+            }
+        }
+        private static int closestIndex(double[] values, double value)
+        {
+            int index = 0;
+            double dist = Math.Abs(values[0] - value);
+            for (int i = 1; i < values.Length; i++)
+            {
+                double dist2 = Math.Abs(values[i] - value);
+                //Debug.WriteLine("in index finder " + Math.Abs(values[i] - value));
+                if (dist2 < dist)
+                {
+                    dist = dist2;
+                    index = i;
+                }
+            }
+            return index;
         }
         #endregion
 
         #region Threads
+        private static async void LoggTemps(Object sender)
+        {
+            sSt = sSt + ", " + setTemp.ToString();
+            sCt = sCt + ", " + curTemp.ToString();
+            sSW = sSW + ", " + stopwatch.ElapsedMilliseconds.ToString();
+            sPw = sPw + ", " + u.ToString();
+            try
+            {
+                await Logger.saveStringToLocalFile(@"Logg\Temp.txt", sCt);
+                await Logger.saveStringToLocalFile(@"Logg\SetTemp.txt", sSt);
+                await Logger.saveStringToLocalFile(@"Logg\Time.txt", sSW);
+                await Logger.saveStringToLocalFile(@"Logg\Power.txt", sPw);
+                Debug.WriteLine("Power: " + u + " P-del: " + p + " I-del: " + i);
+            }
+            catch (Exception) { }
+
+            _timer2.Change(TIME_INTERVAL_LOGG, Timeout.Infinite);
+        }
         // Send power to the heater
         private void pwmHeater(object sender, object e)
         {
@@ -213,6 +310,7 @@ namespace UI_Brewer.Model
         // part of simulator
         private void updateTemp(object sender, object e)
         {
+            convertADCreadingsToTempature();
             if (BrewingTimer.StillCounting())
             {
                 // error
@@ -220,19 +318,25 @@ namespace UI_Brewer.Model
 
                 if (!userSetPower)
                 {
+                    Debug.Write("I 1: " + ((1.0 / Ti) * error) );
                     // Regulator
                     p = Kp * error;
-                    i += 1 / Ti * error;
-                    i = Math.Max(Math.Min(100, i), 0);  // Anti windup
-                    u = p + (i * Kp);
+                    i += (1.0 / Ti) * error;
+                    Debug.Write(" I 2:" + i);                   
+                    //i = i * Kp;
+                    //Debug.WriteLine("I 3:" + i);
+                    i = Math.Max(Math.Min((100.0/Kp), i), (-100.0/Kp));  // Anti windup
+                    Debug.Write(" I 3:" + i);
+                    Debug.WriteLine(" I 4:" + (i*Kp));
+                    u = p + (i*Kp);
                     u = Math.Max(Math.Min(100, u), 0);  // Min value 0 Max value 100
                 }
                 // Change in temp (Simulated data remp region 0-105)
-                var dTemp = u * (PMAX / (double)(CP * M));
-                var tempDiff = 20 - curTemp;
-                curTemp += (dTemp + (0.2 * tempDiff));
-                curTemp = Math.Min(Math.Max(curTemp, 0), 102);
-                if (Math.Abs(curTemp - setTemp) < 1)
+                //var dTemp = u * (PMAX / (double)(CP * M));
+                //var tempDiff = 20 - curTemp;
+                //curTemp += (dTemp + (0.2 * tempDiff));
+                //curTemp = Math.Min(Math.Max(curTemp, 0), 102);
+                if (setTemp - curTemp < 1)
                 {
                     ready = true;
                 }
@@ -260,12 +364,12 @@ namespace UI_Brewer.Model
         {
             if (userSetPower)
             {
-                this.u = u;
+                Brewer.u = u;
             }
         }
         public void setSetTemp(int sTemp)
         {
-            this.setTemp = sTemp;
+            setTemp = sTemp;
         }
         public static bool tempReached()
         {
