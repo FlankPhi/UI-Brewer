@@ -8,7 +8,7 @@
     xmlns:Converters="using:UI_Brewer.Converters"
     xmlns:Common="using:Gauge.Common"
     x:Class="UI_Brewer.MainPage"
-    mc:Ignorable="d">
+    mc:Ignorable="d" Height="480" Width="800">
 
     <Page.Resources>
         <Converters:BoolToVisibility x:Key="BoolToVisibility"/>
@@ -25,8 +25,8 @@
 
     <Grid Background="{ThemeResource AppBarItemForegroundThemeBrush}">
         <!-- Timing Grid -->
-        <Grid HorizontalAlignment="Right" Height="432"  VerticalAlignment="Top" Width="397">
-            <Grid x:Name="Time"  VerticalAlignment="Top" HorizontalAlignment="Center">
+        <Grid HorizontalAlignment="Right" Height="480"  VerticalAlignment="Top" Width="400">
+            <Grid x:Name="Time"  VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,10,0,0">
 
 
                 <!-- Ring 2 Total time count down-->
@@ -116,7 +116,7 @@
 					<Run Text="{Binding SetIntTimeS}"/><LineBreak/>
                 </TextBlock>
             </Grid>
-            <Grid VerticalAlignment="Bottom" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5" Margin="19,0,18,0" Width="360">
+            <Grid VerticalAlignment="Bottom" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5" Margin="19,0,18,0" Width="360" Grid.RowSpan="2">
                 <Ellipse Fill="{Binding ReadIntTimeMin, Converter={StaticResource ValueToColor}}" HorizontalAlignment="Left" Height="30" Stroke="Black" VerticalAlignment="Center" Width="30"  Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}" Margin="97,10,0,32"/>
                 <TextBlock x:Name="textBlockTime"  TextWrapping="Wrap" VerticalAlignment="Top" Height="62" FontSize="18" Foreground="#FFF6E1E1" TextAlignment="Center"  HorizontalAlignment="Center" Width="97" Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}">
                 	<Run Foreground="Gray" Text="Add Inn "/><LineBreak/>
@@ -131,8 +131,8 @@
             </Grid>
         </Grid>
         <!-- Temp Grid -->
-        <Grid HorizontalAlignment="Left" Height="432" VerticalAlignment="Top" Width="371">
-            <Grid x:Name="Temp"  VerticalAlignment="Top" HorizontalAlignment="Center">
+        <Grid HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="400">
+            <Grid x:Name="Temp"  VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,10,0,0">
                 <!-- Ring 1 -->
                 <Grid Width="360" Height="360" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <!-- Ring -->
