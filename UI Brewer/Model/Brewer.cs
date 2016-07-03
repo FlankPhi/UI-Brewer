@@ -24,7 +24,7 @@ namespace UI_Brewer.Model
         private static bool ready = false;
 
         // PID parameters
-        private const double Kp = 5.0;
+        private const double Kp = 10.0;
         private const double Ti = 2000.0;
 
         // Model parameters (for futre work)
@@ -90,7 +90,7 @@ namespace UI_Brewer.Model
             curTemp = 0;
 
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(500);
+            timer.Interval = TimeSpan.FromMilliseconds(1000);
             timer.Tick += updateTemp;
             timer.Start();
 
@@ -197,7 +197,7 @@ namespace UI_Brewer.Model
         {
             //Debug.WriteLine("channel1_value " + channel1_value);
             //Debug.WriteLine("channel2_value " + channel2_value);
-            curTemp = (channel1_value * 25.5) + 7.4465;
+            //curTemp = (channel1_value * 25.5) + 7.4465;
             double readNTC = ((R * channel2_value) / channel1_value) - R;
             //Debug.WriteLine("Read NTC " + readNTC);
             int index = closestIndex(ntcValues,readNTC);
@@ -212,8 +212,8 @@ namespace UI_Brewer.Model
                 {
                     temTemp[i] = temTemp[i + 1];
                     avgT += temTemp[i];
-                }
-                temTemp[49] = (readNTC - b) / a;
+                }//---------------------------------\/--Constant for calibration
+                temTemp[49] = ((readNTC - b) / a) + 6;
                 avgT += temTemp[49];
 
 
