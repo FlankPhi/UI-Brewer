@@ -120,8 +120,71 @@ namespace UI_Brewer
 
 
         #endregion
-    }
 
+        private void HamburgerButton_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine(MySplitView.Height);
+            if (MySplitView.Height < 100 && MySplitView.IsPaneOpen == false)
+            {
+                MySplitView.Height = 480;                                
+            }else if ( MySplitView.Height >= 100 && MySplitView.IsPaneOpen == false)
+            {
+                MySplitView.IsPaneOpen = true;
+            }
+            else
+            {
+                Debug.WriteLine("Setting closed");
+                //StackPanel.Height = 50;
+                MySplitView.Height = 50;
+                MySplitView.IsPaneOpen = false;
+            }
+
+            
+        }
+
+        private void gotoConfigView(object sender, RoutedEventArgs e)
+        {
+            MashConfigFrame.Visibility = Visibility.Visible;
+            MashViewFrame.Visibility = Visibility.Collapsed;
+            BoilViewFrame.Visibility = Visibility.Collapsed;
+            MySplitView.Height = 50;
+            MySplitView.IsPaneOpen = false;
+        }
+
+        private void gotoMashView(object sender, RoutedEventArgs e)
+        {
+            MashConfigFrame.Visibility = Visibility.Collapsed;
+            MashViewFrame.Visibility = Visibility.Visible;
+            BoilViewFrame.Visibility = Visibility.Collapsed;
+            MySplitView.Height = 50;
+            MySplitView.IsPaneOpen = false;
+            //listView.Items.Add(new ListViewItem());
+            //listView.Items.Insert(0, "dfgh");
+
+            //listView.Items.Add("wert");
+            //listView.Items.Add("sdfghjuytfgbjuytfghjuytrdfghjy");
+            //listView.Items.Insert(1, "dfgh");
+
+            //listView.Items.Add(new ListViewItem());
+            //listView.Items.Insert(2, "dfgh");
+        }
+
+        private void gotoBoilView(object sender, RoutedEventArgs e)
+        {
+            MashConfigFrame.Visibility = Visibility.Collapsed;
+            MashViewFrame.Visibility = Visibility.Collapsed;
+            BoilViewFrame.Visibility = Visibility.Visible;
+            MySplitView.Height = 50;
+            MySplitView.IsPaneOpen = false;
+        }
+    }
+    public sealed partial class BoilPage : Page
+    {
+        public BoilPage()
+        {
+            
+        }
+    }
     public class ViewModel : INotifyPropertyChanged
     {
         #region Variabels
