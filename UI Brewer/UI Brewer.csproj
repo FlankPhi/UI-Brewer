@@ -107,6 +107,7 @@
     </Compile>
     <Compile Include="Model\BrewingTimer.cs" />
     <Compile Include="Model\Brewer.cs" />
+    <Compile Include="Model\MashDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

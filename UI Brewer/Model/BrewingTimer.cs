@@ -32,9 +32,9 @@ namespace UI_Brewer.Model
             initSound();
         }
 
-        public void startTotTime(int totTime)
+        public void startTotTime()
         {
-            this.totTime = totTime;
+            this.totTime = MainPage.mashDetails[MainPage.index].Time;
             stopwatch.Start();
         }
         #endregion
@@ -69,6 +69,11 @@ namespace UI_Brewer.Model
                     totTimeRem = 0;
                     totTime = 0;
                     stopwatch.Stop();
+                    if(MainPage.index < MainPage.mashDetails.Count)
+                    {
+                        MainPage.index++;
+                        totTime = MainPage.mashDetails[MainPage.index].Time; 
+                    }
                 }
                 return TimeSpan.FromMilliseconds(totTimeRem).TotalMinutes;
             }

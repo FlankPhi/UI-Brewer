@@ -9,7 +9,7 @@
     xmlns:Common="using:Gauge.Common"
     xmlns:Collections="using:System.Collections"
     x:Class="UI_Brewer.MainPage"
-    mc:Ignorable="d">
+    mc:Ignorable="d" Height="480" Width="800">
 
     <Page.Resources>
         <Converters:BoolToVisibility x:Key="BoolToVisibility"/>
@@ -28,121 +28,249 @@
         <!-- Timing Grid -->
         <!-- Temp Grid -->
         <Frame x:Name="MashViewFrame" HorizontalAlignment="Left" VerticalAlignment="Top" Height="480" Width="800" Margin="0,20,0,0" d:IsHidden="True">
-            <Grid HorizontalAlignment="Right" Height="432"  VerticalAlignment="Top" Width="397">
-                <Grid x:Name="Time"  VerticalAlignment="Top" HorizontalAlignment="Center">
+            <Grid VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Margin="0,0,0,25" Height="455" Width="800">
+                <StackPanel x:Name="StackPanelMVF" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal" Height="455" Width="800">
+                    <StackPanel x:Name="LeftSideMVF" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Height="455" Width="400">
+                        <Grid x:Name="TempMVF"  VerticalAlignment="Top" HorizontalAlignment="Left" Height="445" Width="400" Margin="0,10,0,0">
+                            <!-- Ring 1 -->
+                            <TextBlock x:Name="UserPowTxt" HorizontalAlignment="Center"  TextWrapping="Wrap" VerticalAlignment="Bottom" Height="72" Width="84" FontSize="18" Foreground="#FFF6E1E1" TextAlignment="Center" Margin="0">
+                        		<Run Foreground="Gray" Text="Power "/><LineBreak/>
+                        		<Run Foreground="White" Text="{Binding Power}"/>
+                        		<Run Foreground="Gray" Text="%"/>
+                            </TextBlock>
+                            <Ellipse x:Name="UserPow" Fill="#FFB4E120" HorizontalAlignment="Center" Height="30" Stroke="Black" VerticalAlignment="Bottom" Width="30" RenderTransformOrigin="-0.811,0.444" Margin="0,0,100,25"/>
+                            <!-- Ring 1 -->
+                            <Grid x:Name="TempMCF1" Width="360" Height="360" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,25,0,0">
+                                <!-- Ring -->
+                                <my:RingSlice InnerRadius="140" Radius="180" StartAngle="0" EndAngle="{Binding SetTempMCFA}" >
+                                    <my:RingSlice.Fill>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="Black" Offset="0"/>
+                                            <GradientStop Color="#FF24DCFF" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </my:RingSlice.Fill>
+                                </my:RingSlice>
+                                <!-- Touch knob -->
+                                <Grid RenderTransformOrigin="0.5,0.5">
+                                    <Grid.RenderTransform>
+                                        <CompositeTransform Rotation="{Binding SetTempMCFA}"/>
+                                    </Grid.RenderTransform>
+                                    <Ellipse Width="40" Height="40"  Stretch="Fill" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5" Fill="#FF23D4F6">
+                                        <Ellipse.RenderTransform>
+                                            <CompositeTransform TranslateY="0"/>
+                                        </Ellipse.RenderTransform>
+                                    </Ellipse>
+                                </Grid>
+                                <!-- Touch grid -->
+                                <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangeSetTemperatureMCF">
+                                    <Grid.Clip>
+                                        <RectangleGeometry Rect="160,0,40,40">
+                                            <RectangleGeometry.Transform>
+                                                <CompositeTransform Rotation="{Binding SetTempMCFA}" CenterX="180" CenterY="180" />
+                                            </RectangleGeometry.Transform>
+                                        </RectangleGeometry>
+                                    </Grid.Clip>
+                                </Grid>
+                            </Grid>
 
+                            <!-- Ring 2 Mash Time -->
+                            <Grid x:Name="TimeMCF1" Width="280" Height="280" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,65,0,0">
+                                <!-- Ring -->
+                                <my:RingSlice InnerRadius="100" Radius="140" StartAngle="0" EndAngle="{Binding SetTimeMCFA}" RenderTransformOrigin="0.5,0.5" >
+                                    <my:RingSlice.Fill>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="Black" Offset="0"/>
+                                            <GradientStop Color="#FF24FFB7" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </my:RingSlice.Fill>
+                                </my:RingSlice>
 
-                    <!-- Ring 2 Total time count down-->
+                                <!-- Touch knob -->
+                                <Grid RenderTransformOrigin="0.5,0.5">
+                                    <Grid.RenderTransform>
+                                        <CompositeTransform Rotation="{Binding SetTimeMCFA}"/>
+                                    </Grid.RenderTransform>
+                                    <Ellipse Width="40" Height="40"  Stretch="Fill" Fill="#FF21EBA8" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Ellipse.RenderTransform>
+                                            <CompositeTransform TranslateY="0"/>
+                                        </Ellipse.RenderTransform>
+                                    </Ellipse>
+                                </Grid>
+                                <!-- Touch grid -->
+                                <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangeSetTimeMCF">
+                                    <Grid.Clip>
+                                        <RectangleGeometry Rect="120,0,40,40">
+                                            <RectangleGeometry.Transform>
+                                                <CompositeTransform Rotation="{Binding SetTimeMCFA}" CenterX="140" CenterY="140" />
+                                            </RectangleGeometry.Transform>
+                                        </RectangleGeometry>
+                                    </Grid.Clip>
+                                </Grid>
+                            </Grid>
 
+                            <!-- Ring 3 Power use in prosentage-->
+                            <Grid x:Name="PowerMCF1" Width="200" Height="200" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,105,0,0">
+                                <!-- Ring -->
+                                <my:RingSlice InnerRadius="60" Radius="100" StartAngle="0" EndAngle="{Binding PowerMCFA}" >
+                                    <my:RingSlice.Fill>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="Black" Offset="0"/>
+                                            <GradientStop Color="#FFCDFF24" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </my:RingSlice.Fill>
+                                </my:RingSlice>
 
-                    <!-- Ring 2 Total time count down-->
-                    <Grid Width="360" Height="360" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <!-- Ring -->
-                        <my:RingSlice InnerRadius="140" Radius="180" StartAngle="0" EndAngle="{Binding SetTotTimeA}" >
-                            <my:RingSlice.Fill>
-                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                    <GradientStop Color="Black" Offset="0"/>
-                                    <GradientStop Color="#FF21EBA8" Offset="1"/>
-                                </LinearGradientBrush>
-                            </my:RingSlice.Fill>
-                        </my:RingSlice>
-
-                        <!-- Touch knob -->
-                        <Grid RenderTransformOrigin="0.5,0.5">
-                            <Grid.RenderTransform>
-                                <CompositeTransform Rotation="{Binding SetTotTimeA}"/>
-                            </Grid.RenderTransform>
-                            <Ellipse Width="40" Height="40"  Stretch="Fill" Fill="#FF21EBA8" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
-                                <Ellipse.RenderTransform>
-                                    <CompositeTransform TranslateY="0"/>
-                                </Ellipse.RenderTransform>
-                            </Ellipse>
+                                <Grid RenderTransformOrigin="0.5,0.5">
+                                    <Grid.RenderTransform>
+                                        <CompositeTransform Rotation="{Binding PowerMCFA}"/>
+                                    </Grid.RenderTransform>
+                                    <Ellipse Width="40" Height="40"  Stretch="Fill" Fill="#FFB4E120" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Ellipse.RenderTransform>
+                                            <CompositeTransform TranslateY="0"/>
+                                        </Ellipse.RenderTransform>
+                                    </Ellipse>
+                                    <TextBlock x:Name="setPower1" VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="28" 
+                        				Foreground="Gray" TextAlignment="Center" RenderTransformOrigin="0.5,0.5" Visibility="Collapsed">
+                                        <TextBlock.RenderTransform>
+                                            <CompositeTransform Rotation="{Binding PowerMCFA, Converter={StaticResource NegativConverter}}"/>
+                                        </TextBlock.RenderTransform>
+                        				<Run Text="{Binding Power}"/>
+                        				<Run Text="%"/>
+                                    </TextBlock>
+                                </Grid>
+                                <!-- Touch grid -->
+                                <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangePowerOutputMCF">
+                                    <Grid.Clip>
+                                        <RectangleGeometry Rect="80,0,40,40">
+                                            <RectangleGeometry.Transform>
+                                                <CompositeTransform Rotation="{Binding PowerMCFA}" CenterX="100" CenterY="100" />
+                                            </RectangleGeometry.Transform>
+                                        </RectangleGeometry>
+                                    </Grid.Clip>
+                                    <TextBlock />
+                                </Grid>
+                            </Grid>
+                            <!-- Temp Text -->
+                            <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="18" Foreground="Gray" TextAlignment="Center" RenderTransformOrigin="0.5,0.5" Margin="0,140,0,0">
+                                <TextBlock.RenderTransform>
+                                    <CompositeTransform TranslateY="15"/>
+                                </TextBlock.RenderTransform>  
+                        		<Run Text="Set Temp"/><LineBreak/>
+                        		<Run Foreground="White" Text="{Binding SetTempMCF}"/>
+                        		<Run Text="°C"/><LineBreak/>   
+                        		<Run Text="Temp"/><LineBreak/>
+                        		<Run Foreground="White" Text="{Binding SetTempMCF}"/>
+                        		<Run Text="°C"/><LineBreak/>
+                            </TextBlock>
                         </Grid>
+                    </StackPanel>
+                    <StackPanel x:Name="RightSideMVF" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Height="455" Width="400">
+                        <Grid x:Name="TimeMVF" HorizontalAlignment="Right" Height="455"  VerticalAlignment="Top" Width="397" Margin="0,10,3,0">
 
-                        <!-- Touch grid -->
-                        <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="SetTotalTime">
-                            <Grid.Clip>
-                                <RectangleGeometry Rect="160,0,40,40">
-                                    <RectangleGeometry.Transform>
-                                        <CompositeTransform Rotation="{Binding SetTotTimeA}" CenterX="180" CenterY="180" />
-                                    </RectangleGeometry.Transform>
-                                </RectangleGeometry>
-                            </Grid.Clip>
+                            <Grid x:Name="Time"  VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,25,0,0">
+
+
+                                <!-- Ring 2 Total time count down-->
+                                <!-- Ring 2 Total time count down-->
+                                <Grid Width="360" Height="360" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <!-- Ring -->
+                                    <my:RingSlice InnerRadius="140" Radius="180" StartAngle="0" EndAngle="{Binding SetTotTimeA}" >
+                                        <my:RingSlice.Fill>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="Black" Offset="0"/>
+                                                <GradientStop Color="#FF21EBA8" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </my:RingSlice.Fill>
+                                    </my:RingSlice>
+
+                                    <!-- Touch knob -->
+                                    <Grid RenderTransformOrigin="0.5,0.5">
+                                        <Grid.RenderTransform>
+                                            <CompositeTransform Rotation="{Binding SetTotTimeA}"/>
+                                        </Grid.RenderTransform>
+                                        <Ellipse Width="40" Height="40"  Stretch="Fill" Fill="#FF21EBA8" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                            <Ellipse.RenderTransform>
+                                                <CompositeTransform TranslateY="0"/>
+                                            </Ellipse.RenderTransform>
+                                        </Ellipse>
+                                    </Grid>
+
+                                    <!-- Touch grid -->
+                                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="SetTotalTime">
+                                        <Grid.Clip>
+                                            <RectangleGeometry Rect="160,0,40,40">
+                                                <RectangleGeometry.Transform>
+                                                    <CompositeTransform Rotation="{Binding SetTotTimeA}" CenterX="180" CenterY="180" />
+                                                </RectangleGeometry.Transform>
+                                            </RectangleGeometry>
+                                        </Grid.Clip>
+                                    </Grid>
+                                </Grid>
+
+
+                                <!-- Ring 3 For setting interval times and count down interval times-->
+                                <Grid Width="280" Height="280" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <!-- Ring -->
+                                    <my:RingSlice InnerRadius="100" Radius="140" StartAngle="0" EndAngle="{Binding SetIntTimeA}" >
+                                        <my:RingSlice.Fill>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="Black" Offset="0"/>
+                                                <GradientStop Color="#FF23D4F6" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </my:RingSlice.Fill>
+                                    </my:RingSlice>
+
+                                    <!-- Touch knob -->
+                                    <Grid RenderTransformOrigin="0.5,0.5">
+                                        <Grid.RenderTransform>
+                                            <CompositeTransform Rotation="{Binding SetIntTimeA}"/>
+                                        </Grid.RenderTransform>
+                                        <Ellipse Width="40" Height="40"  Stretch="Fill" Fill="#FF23D4F6" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                            <Ellipse.RenderTransform>
+                                                <CompositeTransform TranslateY="0"/>
+                                            </Ellipse.RenderTransform>
+                                        </Ellipse>
+                                    </Grid>
+                                    <!-- Touch grid -->
+                                    <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangeIntTime" PointerReleased="ConfirmIntTime">
+                                        <Grid.Clip>
+                                            <RectangleGeometry Rect="120,0,40,40">
+                                                <RectangleGeometry.Transform>
+                                                    <CompositeTransform Rotation="{Binding SetIntTimeA}" CenterX="140" CenterY="140" />
+                                                </RectangleGeometry.Transform>
+                                            </RectangleGeometry>
+                                        </Grid.Clip>
+                                    </Grid>
+                                </Grid>
+                                <!-- Timing text -->
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" Foreground="Gray" TextAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                    <TextBlock.RenderTransform>
+                                        <CompositeTransform TranslateY="20"/>
+                                    </TextBlock.RenderTransform>  
+                    				<Run Text="Total"/><LineBreak/>
+                    				<Run Foreground="White" Text="{Binding SetTotTime}"/>
+                    				<Run Text="{Binding SetTotTimeS}"/><LineBreak/>   
+                    				<Run Text="Interv"/><LineBreak/>
+                    				<Run Foreground="White" Text="{Binding SetIntTime}"/>
+                    				<Run Text="{Binding SetIntTimeS}"/><LineBreak/>
+                                </TextBlock>
+                            </Grid>
+                            <Grid VerticalAlignment="Bottom" HorizontalAlignment="Left" RenderTransformOrigin="0.5,0.5" Margin="19,0,0,0" Width="378" Height="75">
+                                <Ellipse Fill="{Binding ReadIntTimeMin, Converter={StaticResource ValueToColor}}" HorizontalAlignment="Left" Height="30" Stroke="Black" VerticalAlignment="Center" Width="30"  Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}" Margin="97,10,0,32"/>
+                                <TextBlock x:Name="textBlockTime"  TextWrapping="Wrap" VerticalAlignment="Top" Height="62" FontSize="18" Foreground="#FFF6E1E1" TextAlignment="Center"  HorizontalAlignment="Center" Width="97" Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}">
+                    				<Run Foreground="Gray" Text="Add Inn "/><LineBreak/>
+                    				<Run Foreground="White" Text="{Binding ReadIntTime}"/>
+                    				<Run Foreground="Gray" Text="{Binding ReadIntTimeS}"/>
+                                </TextBlock>
+                                <TextBlock x:Name="textBlockTimeConst" HorizontalAlignment="Right"  TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="94" FontSize="18" Foreground="#FFF6E1E1" TextAlignment="Center"  Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}">
+                    				<Run Foreground="Gray" Text="Add Time "/><LineBreak/>
+                    				<Run Foreground="White" Text="{Binding ReadIntTimeCon}"/>
+                    				<Run Foreground="Gray" Text=" m"/>
+                                </TextBlock>
+                            </Grid>
                         </Grid>
-                    </Grid>
-
-
-                    <!-- Ring 3 For setting interval times and count down interval times-->
-                    <Grid Width="280" Height="280" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <!-- Ring -->
-                        <my:RingSlice InnerRadius="100" Radius="140" StartAngle="0" EndAngle="{Binding SetIntTimeA}" >
-                            <my:RingSlice.Fill>
-                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                    <GradientStop Color="Black" Offset="0"/>
-                                    <GradientStop Color="#FF23D4F6" Offset="1"/>
-                                </LinearGradientBrush>
-                            </my:RingSlice.Fill>
-                        </my:RingSlice>
-
-                        <!-- Touch knob -->
-                        <Grid RenderTransformOrigin="0.5,0.5">
-                            <Grid.RenderTransform>
-                                <CompositeTransform Rotation="{Binding SetIntTimeA}"/>
-                            </Grid.RenderTransform>
-                            <Ellipse Width="40" Height="40"  Stretch="Fill" Fill="#FF23D4F6" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
-                                <Ellipse.RenderTransform>
-                                    <CompositeTransform TranslateY="0"/>
-                                </Ellipse.RenderTransform>
-                            </Ellipse>
-                        </Grid>
-                        <!-- Touch grid -->
-                        <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangeIntTime" PointerReleased="ConfirmIntTime">
-                            <Grid.Clip>
-                                <RectangleGeometry Rect="120,0,40,40">
-                                    <RectangleGeometry.Transform>
-                                        <CompositeTransform Rotation="{Binding SetIntTimeA}" CenterX="140" CenterY="140" />
-                                    </RectangleGeometry.Transform>
-                                </RectangleGeometry>
-                            </Grid.Clip>
-                        </Grid>
-                    </Grid>
-                    <!-- Timing text -->
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" Foreground="Gray" TextAlignment="Center" RenderTransformOrigin="0.5,0.5">
-                        <TextBlock.RenderTransform>
-                            <CompositeTransform TranslateY="20"/>
-                        </TextBlock.RenderTransform>  
-						<Run Text="Total"/><LineBreak/>
-						<Run Foreground="White" Text="{Binding SetTotTime}"/>
-						<Run Text="{Binding SetTotTimeS}"/><LineBreak/>   
-						<Run Text="Interv"/><LineBreak/>
-						<Run Foreground="White" Text="{Binding SetIntTime}"/>
-						<Run Text="{Binding SetIntTimeS}"/><LineBreak/>
-                    </TextBlock>
-                </Grid>
-                <Grid VerticalAlignment="Bottom" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5" Margin="19,0,18,0" Width="360">
-                    <Ellipse Fill="{Binding ReadIntTimeMin, Converter={StaticResource ValueToColor}}" HorizontalAlignment="Left" Height="30" Stroke="Black" VerticalAlignment="Center" Width="30"  Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}" Margin="97,10,0,32"/>
-                    <TextBlock x:Name="textBlockTime"  TextWrapping="Wrap" VerticalAlignment="Top" Height="62" FontSize="18" Foreground="#FFF6E1E1" TextAlignment="Center"  HorizontalAlignment="Center" Width="97" Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}">
-						<Run Foreground="Gray" Text="Add Inn "/><LineBreak/>
-						<Run Foreground="White" Text="{Binding ReadIntTime}"/>
-						<Run Foreground="Gray" Text="{Binding ReadIntTimeS}"/>
-                    </TextBlock>
-                    <TextBlock x:Name="textBlockTimeConst" HorizontalAlignment="Right"  TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="94" FontSize="18" Foreground="#FFF6E1E1" TextAlignment="Center"  Visibility="{Binding ReadIntTimeShow, Converter={StaticResource BoolToVisibility}}">
-						<Run Foreground="Gray" Text="Add Time "/><LineBreak/>
-						<Run Foreground="White" Text="{Binding ReadIntTimeCon}"/>
-						<Run Foreground="Gray" Text=" m"/>
-                    </TextBlock>
-                </Grid>
-                <Grid HorizontalAlignment="Left" Height="432" VerticalAlignment="Top" Width="371">
-                    <Grid VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5">
-                        <Ellipse x:Name="UserPow" Fill="#FFB4E120" HorizontalAlignment="Left" Height="30" Stroke="Black" VerticalAlignment="Top" Width="30" RenderTransformOrigin="-0.811,0.444" Margin="109,10,0,0"/>
-                        <TextBlock x:Name="UserPowTxt" HorizontalAlignment="Center"  TextWrapping="Wrap" VerticalAlignment="Top" Height="72" Width="84" FontSize="18" Foreground="#FFF6E1E1" TextAlignment="Center">
-							<Run Foreground="Gray" Text="Power "/><LineBreak/>
-							<Run Foreground="White" Text="{Binding Power}"/>
-							<Run Foreground="Gray" Text="%"/>
-                        </TextBlock>
-                    </Grid>
-
-                </Grid>
+                    </StackPanel>
+                </StackPanel>
             </Grid>
         </Frame>
         <Frame x:Name="IntroFrame">
@@ -202,21 +330,17 @@
                         </StackPanel>
                     </StackPanel>
                 </SplitView.Pane>
-                <Grid>
-                    <!--<TextBlock Text="SplitVeiw Basic" FontSize="34" Foreground="White" 
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
-                </Grid>
 
             </SplitView>
         </Frame>
         <Frame x:Name="MashConfigFrame" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Width="800" Height="480">
             <StackPanel x:Name="StackPanelMC" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal" Height="480" Width="800">
                 <StackPanel x:Name="LeftSideMCF" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Height="480" Width="400">
-                    <Grid x:Name="Temp"  VerticalAlignment="Top" HorizontalAlignment="Center" Height="480" Width="400">
+                    <Grid x:Name="Temp"  VerticalAlignment="Top" HorizontalAlignment="Left" Height="480" Width="400" Margin="0,10,0,0">
                         <!-- Ring 1 -->
-                        <Grid x:Name="TempMCF" Width="360" Height="360" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid x:Name="TempMCF" Width="360" Height="360" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,25,0,0">
                             <!-- Ring -->
-                            <my:RingSlice InnerRadius="140" Radius="180" StartAngle="0" EndAngle="{Binding SetTempA}" >
+                            <my:RingSlice InnerRadius="140" Radius="180" StartAngle="0" EndAngle="{Binding SetTempMCFA}" >
                                 <my:RingSlice.Fill>
                                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                         <GradientStop Color="Black" Offset="0"/>
@@ -227,7 +351,7 @@
                             <!-- Touch knob -->
                             <Grid RenderTransformOrigin="0.5,0.5">
                                 <Grid.RenderTransform>
-                                    <CompositeTransform Rotation="{Binding SetTempA}"/>
+                                    <CompositeTransform Rotation="{Binding SetTempMCFA}"/>
                                 </Grid.RenderTransform>
                                 <Ellipse Width="40" Height="40"  Stretch="Fill" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5" Fill="#FF23D4F6">
                                     <Ellipse.RenderTransform>
@@ -236,21 +360,21 @@
                                 </Ellipse>
                             </Grid>
                             <!-- Touch grid -->
-                            <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangeSetTemperature">
+                            <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangeSetTemperatureMCF">
                                 <Grid.Clip>
                                     <RectangleGeometry Rect="160,0,40,40">
                                         <RectangleGeometry.Transform>
-                                            <CompositeTransform Rotation="{Binding SetTempA}" CenterX="180" CenterY="180" />
+                                            <CompositeTransform Rotation="{Binding SetTempMCFA}" CenterX="180" CenterY="180" />
                                         </RectangleGeometry.Transform>
                                     </RectangleGeometry>
                                 </Grid.Clip>
                             </Grid>
                         </Grid>
 
-                        <!-- Ring 2 True temperture-->
-                        <Grid x:Name="TimeMCF" Width="280" Height="280" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <!-- Ring 2 Mash Time -->
+                        <Grid x:Name="TimeMCF" Width="280" Height="280" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,65,0,0">
                             <!-- Ring -->
-                            <my:RingSlice InnerRadius="100" Radius="140" StartAngle="0" EndAngle="{Binding TempA}" RenderTransformOrigin="0.5,0.5" >
+                            <my:RingSlice InnerRadius="100" Radius="140" StartAngle="0" EndAngle="{Binding SetTimeMCFA}" RenderTransformOrigin="0.5,0.5" >
                                 <my:RingSlice.Fill>
                                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                         <GradientStop Color="Black" Offset="0"/>
@@ -262,7 +386,7 @@
                             <!-- Touch knob -->
                             <Grid RenderTransformOrigin="0.5,0.5">
                                 <Grid.RenderTransform>
-                                    <CompositeTransform Rotation="{Binding TempA}"/>
+                                    <CompositeTransform Rotation="{Binding SetTimeMCFA}"/>
                                 </Grid.RenderTransform>
                                 <Ellipse Width="40" Height="40"  Stretch="Fill" Fill="#FF21EBA8" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                                     <Ellipse.RenderTransform>
@@ -271,11 +395,11 @@
                                 </Ellipse>
                             </Grid>
                             <!-- Touch grid -->
-                            <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="Grid_ManipulationDelta_1">
+                            <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangeSetTimeMCF">
                                 <Grid.Clip>
                                     <RectangleGeometry Rect="120,0,40,40">
                                         <RectangleGeometry.Transform>
-                                            <CompositeTransform Rotation="{Binding TempA}" CenterX="140" CenterY="140" />
+                                            <CompositeTransform Rotation="{Binding SetTimeMCFA}" CenterX="140" CenterY="140" />
                                         </RectangleGeometry.Transform>
                                     </RectangleGeometry>
                                 </Grid.Clip>
@@ -283,9 +407,9 @@
                         </Grid>
 
                         <!-- Ring 3 Power use in prosentage-->
-                        <Grid x:Name="PowerMCF" Width="200" Height="200" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid x:Name="PowerMCF" Width="200" Height="200" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,105,0,0">
                             <!-- Ring -->
-                            <my:RingSlice InnerRadius="60" Radius="100" StartAngle="0" EndAngle="{Binding PowerA}" >
+                            <my:RingSlice InnerRadius="60" Radius="100" StartAngle="0" EndAngle="{Binding PowerMCFA}" >
                                 <my:RingSlice.Fill>
                                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                         <GradientStop Color="Black" Offset="0"/>
@@ -296,7 +420,7 @@
 
                             <Grid RenderTransformOrigin="0.5,0.5">
                                 <Grid.RenderTransform>
-                                    <CompositeTransform Rotation="{Binding PowerA}"/>
+                                    <CompositeTransform Rotation="{Binding PowerMCFA}"/>
                                 </Grid.RenderTransform>
                                 <Ellipse Width="40" Height="40"  Stretch="Fill" Fill="#FFB4E120" VerticalAlignment="Top" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                                     <Ellipse.RenderTransform>
@@ -306,18 +430,18 @@
                                 <TextBlock x:Name="setPower" VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="28" 
 									Foreground="Gray" TextAlignment="Center" RenderTransformOrigin="0.5,0.5" Visibility="Collapsed">
                                     <TextBlock.RenderTransform>
-                                        <CompositeTransform Rotation="{Binding PowerA, Converter={StaticResource NegativConverter}}"/>
+                                        <CompositeTransform Rotation="{Binding PowerMCFA, Converter={StaticResource NegativConverter}}"/>
                                     </TextBlock.RenderTransform>
 									<Run Text="{Binding Power}"/>
 									<Run Text="%"/>
                                 </TextBlock>
                             </Grid>
                             <!-- Touch grid -->
-                            <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangePowerOutput" PointerPressed="clickDown" DoubleTapped="powerDtapped">
+                            <Grid Background="Transparent" ManipulationMode="TranslateX,TranslateY" ManipulationDelta="ChangePowerOutputMCF">
                                 <Grid.Clip>
                                     <RectangleGeometry Rect="80,0,40,40">
                                         <RectangleGeometry.Transform>
-                                            <CompositeTransform Rotation="{Binding PowerA}" CenterX="100" CenterY="100" />
+                                            <CompositeTransform Rotation="{Binding PowerMCFA}" CenterX="100" CenterY="100" />
                                         </RectangleGeometry.Transform>
                                     </RectangleGeometry>
                                 </Grid.Clip>
@@ -325,20 +449,128 @@
                             </Grid>
                         </Grid>
                         <!-- Temp Text -->
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" Foreground="Gray" TextAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="18" Foreground="Gray" TextAlignment="Center" RenderTransformOrigin="0.5,0.5" Margin="0,140,0,0">
                             <TextBlock.RenderTransform>
                                 <CompositeTransform TranslateY="15"/>
                             </TextBlock.RenderTransform>  
 							<Run Text="Set Temp"/><LineBreak/>
-							<Run Foreground="White" Text="{Binding SetTemp}"/>
+							<Run Foreground="White" Text="{Binding SetTempMCF}"/>
 							<Run Text="°C"/><LineBreak/>   
-							<Run Text="Temp"/><LineBreak/>
-							<Run Foreground="White" Text="{Binding Temp}"/>
-							<Run Text="°C"/><LineBreak/>
+							<Run Text="Time"/><LineBreak/>
+							<Run Foreground="White" Text="{Binding SetTimeMCF}"/>
+							<Run Text="m"/><LineBreak/>
                         </TextBlock>
                     </Grid>
                 </StackPanel>
-                <StackPanel x:Name="RightSideMCF" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Height="480" Width="400"/>
+                <StackPanel x:Name="RightSideMCF" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Height="480" Width="400">
+                    <Grid Height="480" VerticalAlignment="Bottom" Margin="0">
+                        <Grid Width="400"  VerticalAlignment="Top">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="80" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="Order" TextAlignment="Center" >
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                            <TextBlock Grid.Column="1" Text="Set Temp" TextAlignment="Center" >
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                            <TextBlock Grid.Column="2" Text="Time" TextAlignment="Center" >
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                            <TextBlock Grid.Column="3" Text="Power" TextAlignment="Center" >
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                            <TextBlock Grid.Column="4" Text="" TextAlignment="Center" >
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                </TextBlock.Foreground>
+                            </TextBlock>
+
+                        </Grid>
+                        <ListView x:Name="myListView" Margin="0,25,0,0" Width="400">
+                            <ListView.Foreground>
+                                <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                            </ListView.Foreground>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Width="400" VerticalAlignment="Center">
+                                        <Grid.Background>
+                                            <SolidColorBrush Color="{ThemeResource SystemBaseMediumColor}"/>
+                                        </Grid.Background>
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="80" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding Order}" TextAlignment="Center" HorizontalAlignment="Center" >
+                                            <TextBlock.Foreground>
+                                                <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                            </TextBlock.Foreground>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="1" Text="{Binding SetTemp}" TextAlignment="Center" HorizontalAlignment="Center" >
+                                            <TextBlock.Foreground>
+                                                <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                            </TextBlock.Foreground>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="2" Text="{Binding Time}" TextAlignment="Center" HorizontalAlignment="Center" >
+                                            <TextBlock.Foreground>
+                                                <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                            </TextBlock.Foreground>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="3" Text="{Binding Power}" TextAlignment="Center" HorizontalAlignment="Center" >
+                                            <TextBlock.Foreground>
+                                                <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                            </TextBlock.Foreground>
+                                        </TextBlock>
+                                        <!--<Button Grid.Column="4" FontFamily="Segoe MDL2 Assets" Content="&#xE107;" HorizontalAlignment="Center" Click="RemoveMashSetting">
+                                            <Button.Foreground>
+                                                <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                            </Button.Foreground>
+                                        </Button>-->
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <Grid HorizontalAlignment="Left" Height="80" Margin="0,400,0,0" VerticalAlignment="Top" Width="400">
+                            <Button x:Name="Add" Content="Add" HorizontalAlignment="Left" Margin="20,10,0,0" VerticalAlignment="Top" Height="60" Width="100" Click="Add_Click">
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                </Button.Foreground>
+                                <Button.Background>
+                                    <SolidColorBrush Color="{ThemeResource SystemBaseMediumHighColor}"/>
+                                </Button.Background>
+                            </Button>
+                            <Button  FontFamily="Segoe MDL2 Assets" Content="&#xE107;" HorizontalAlignment="Center" Click="RemoveMashSetting" Height="80" Margin="125,0" Width="150">
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                </Button.Foreground>
+                            </Button>
+                            <Button x:Name="Start" Content="Brew" HorizontalAlignment="Right" Margin="0,10,20,0" VerticalAlignment="Top" Height="60" Width="100" Click="Start_Click">
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="{ThemeResource SystemAltHighColor}"/>
+                                </Button.Foreground>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </StackPanel>
             </StackPanel>
         </Frame>
         <Frame x:Name="BoilViewFrame" Content="Frame" HorizontalAlignment="Left" Margin="645,230,0,0" VerticalAlignment="Top" d:IsHidden="True"/>

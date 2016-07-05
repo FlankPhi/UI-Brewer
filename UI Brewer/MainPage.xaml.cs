@@ -8,6 +8,7 @@ using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using System.Collections.Generic;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -19,14 +20,20 @@ namespace UI_Brewer
     /// </summary>
     public sealed partial class MainPage : Page
     {
-
+        public static int index = 1;
+        public static List<MashDetails> mashDetails = new List<MashDetails>();
+        public static bool startBrewer = false;
         public MainPage()
         {
+            
             InitializeComponent();
             Brewer.initGpio();
             //Logger.run();
-           
-            
+            MashConfigFrame.Visibility = Visibility.Collapsed;
+            MashViewFrame.Visibility = Visibility.Collapsed;
+            BoilViewFrame.Visibility = Visibility.Collapsed;
+
+
         }
 
         #region touchEvents
@@ -177,6 +184,74 @@ namespace UI_Brewer
             MySplitView.Height = 50;
             MySplitView.IsPaneOpen = false;
         }
+
+        private void Start_Click(object sender, RoutedEventArgs e)
+        {
+            startBrewer = true;
+            Brewer.setSetTemp();
+        }
+
+        private void Add_Click(object sender, RoutedEventArgs e)
+        {
+            int count = mashDetails.Count;
+            mashDetails.Add(new MashDetails
+            {
+                Order = (count + 1),
+                SetTemp = (this.DataContext as ViewModel).SetTempMCF,
+                Time = (this.DataContext as ViewModel).SetTimeMCF,
+                Power = (this.DataContext as ViewModel).PowerMCF
+            });
+            Debug.WriteLine("Printing " + mashDetails[count].Order
+                + " " + mashDetails[count].SetTemp
+                + " " + mashDetails[count].Time
+                + " " + mashDetails[count].Power);
+            myListView.ItemsSource = null;
+            myListView.ItemsSource = mashDetails;
+            
+            
+
+        }
+
+        private void ChangeSetTemperatureMCF(object sender, ManipulationDeltaRoutedEventArgs e)
+        {
+            var grid = sender as Grid;
+            var angle = GetAngle(e.Position, grid.RenderSize);
+            (this.DataContext as ViewModel).SetTempMCFA = angle;
+        }
+
+        private void ChangeSetTimeMCF(object sender, ManipulationDeltaRoutedEventArgs e)
+        {
+            var grid = sender as Grid;
+            var angle = GetAngle(e.Position, grid.RenderSize);
+            (this.DataContext as ViewModel).SetTimeMCFA = angle;
+        }
+
+        private void ChangePowerOutputMCF(object sender, ManipulationDeltaRoutedEventArgs e)
+        {
+            var grid = sender as Grid;
+            var angle = GetAngle(e.Position, grid.RenderSize);
+            (this.DataContext as ViewModel).PowerMCFA = angle;
+        }
+
+        private void RemoveMashSetting(object sender, RoutedEventArgs e)
+        {
+            var index = myListView.SelectedIndex;
+            Debug.WriteLine(index);
+            if (index != -1)
+            {
+                Debug.WriteLine(index);
+                mashDetails.RemoveAt(index);
+
+                myListView.ItemsSource = null;
+                myListView.ItemsSource = mashDetails;
+
+                for(int i = index; i < mashDetails.Count; i++)
+                {
+                    mashDetails[i].Order = i+1;
+                }
+            }
+
+        }
     }
     public sealed partial class BoilPage : Page
     {
@@ -187,6 +262,64 @@ namespace UI_Brewer
     }
     public class ViewModel : INotifyPropertyChanged
     {
+
+        #region Mash Config
+        double m_setTempMCFA = default(double);
+        public double SetTempMCFA
+        {
+            get { return m_setTempMCFA; }
+            set
+            {
+                SetProperty(ref m_setTempMCFA, value);
+                SetTempMCF = (int)Math.Round((value / 3.4d));
+
+            }
+        }
+        int m_setTempMCF = default(int);
+        public int SetTempMCF { get { return m_setTempMCF; } private set { SetProperty(ref m_setTempMCF, value); } }
+
+        double m_setTimeMCFA = default(double);
+        public double SetTimeMCFA
+        {
+            get { return m_setTimeMCFA; }
+            set
+            {
+                SetProperty(ref m_setTimeMCFA, value);
+                SetTimeMCF = (int)Math.Round((value / 3.4d));
+            }
+        }
+        int m_setTimeMCF = default(int);
+        public int SetTimeMCF
+        {
+            get { return m_setTimeMCF; }
+            set
+            {
+                SetProperty(ref m_setTimeMCF, value);
+            }
+        }
+
+        double m_powerMCFA = default(double);
+        public double PowerMCFA
+        {
+            get { return m_powerMCFA; }
+            set
+            {
+                SetProperty(ref m_powerMCFA, value);
+                PowerMCF = (int)Math.Round((value / 3.6d));
+            }
+        }
+
+        int m_powerMCF = default(int);
+        public int PowerMCF
+        {
+            get { return m_powerMCF; }
+            private set
+            {
+                SetProperty(ref m_powerMCF, value);
+            }
+        }
+        #endregion
+
         #region Variabels
         private int counter;
 
@@ -224,56 +357,63 @@ namespace UI_Brewer
         #region Threads
         public void updateValues(object sender, object e)
         {
-            counter++;
-            Temp = (int) Math.Round(brewerObject.getCurTemp());
-            TempA = brewerObject.getCurTemp() * 3.4;
-            Power = (int)Math.Round(brewerObject.getPower());
-            PowerA = brewerObject.getPower() * 3.59;
-            ReadIntTimeShow = Brewer.tempReached();
-
-            if (Brewer.tempReached())
-            {            
-                SetTotTimeA = timData.getRemTimeRem() * 3;
-                SetTotTime = (int)timData.getRemTimeRem();                
-                if (SetTotTime <= 1)
-                {
-                    SetTotTime = (int)TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds;
-                    SetTotTimeS = " s";
-                    ReadIntTime = SetTotTime - (int)TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds;
-                }
-                else
-                {
-                    ReadIntTime = SetTotTime - timData.getAddTime();
-                    SetTotTimeS = " m";
-                }
+            if (MainPage.startBrewer)
+            {
                 
-                SetIntTimeA = timData.getIntTimeRem() * 3;
-                SetIntTime = (int)timData.getIntTimeRem();
+                counter++;
+                Temp = (int)Math.Round(brewerObject.getCurTemp());
+                TempA = brewerObject.getCurTemp() * 3.4;
+                SetTemp = (int)Math.Round(brewerObject.getSetTemp());
+                SetTempA = brewerObject.getSetTemp() * 3.4;
+                Power = (int)Math.Round(brewerObject.getPower());
+                PowerA = brewerObject.getPower() * 3.59;
+                ReadIntTimeShow = Brewer.tempReached();
 
-                if (SetIntTime <= 1)
+                if (Brewer.tempReached())
                 {
-                    SetIntTime = (int)TimeSpan.FromMinutes(timData.getIntTimeRem()).TotalSeconds;
-                    SetIntTimeS = " s";
-                }else
-                {
-                    SetIntTimeS = " m";
-                }
+                    SetTotTimeA = timData.getRemTimeRem() * 3;
+                    SetTotTime = (int)timData.getRemTimeRem();
+                    if (SetTotTime <= 1)
+                    {
+                        SetTotTime = (int)TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds;
+                        SetTotTimeS = " s";
+                        ReadIntTime = SetTotTime - (int)TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds;
+                    }
+                    else
+                    {
+                        ReadIntTime = SetTotTime - timData.getAddTime();
+                        SetTotTimeS = " m";
+                    }
 
-                
-                ReadIntTimeMin = (int)(TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds 
-                    - TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds); 
-                ReadIntTimeCon = timData.getAddTime();
+                    SetIntTimeA = timData.getIntTimeRem() * 3;
+                    SetIntTime = (int)timData.getIntTimeRem();
 
-                if (Math.Abs(ReadIntTime) <= 1)
-                {
-                    ReadIntTime =
-                        (int)TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds
-                        - (int)TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds;
-                    ReadIntTimeS = " s";
-                }
-                else
-                {
-                    ReadIntTimeS = " m";
+                    if (SetIntTime <= 1)
+                    {
+                        SetIntTime = (int)TimeSpan.FromMinutes(timData.getIntTimeRem()).TotalSeconds;
+                        SetIntTimeS = " s";
+                    }
+                    else
+                    {
+                        SetIntTimeS = " m";
+                    }
+
+
+                    ReadIntTimeMin = (int)(TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds
+                        - TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds);
+                    ReadIntTimeCon = timData.getAddTime();
+
+                    if (Math.Abs(ReadIntTime) <= 1)
+                    {
+                        ReadIntTime =
+                            (int)TimeSpan.FromMinutes(timData.getRemTimeRem()).TotalSeconds
+                            - (int)TimeSpan.FromMinutes(timData.getAddTime()).TotalSeconds;
+                        ReadIntTimeS = " s";
+                    }
+                    else
+                    {
+                        ReadIntTimeS = " m";
+                    }
                 }
             }
         }
@@ -339,7 +479,7 @@ namespace UI_Brewer
                 SetProperty(ref m_setTempA, value);
                 SetTemp = (int)Math.Round((value / 3.4d));
                
-                brewerObject.setSetTemp(m_setTemp);
+                //brewerObject.setSetTemp(m_setTemp);
             }
         }
         int m_setTemp = default(int);

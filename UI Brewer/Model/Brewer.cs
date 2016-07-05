@@ -7,6 +7,7 @@ using Windows.Devices.Gpio;
 using ABElectronics_Win10IOT_Libraries;
 using System.Threading;
 using UI_Brewer.Logg;
+using System.Collections.Generic;
 #endregion
 
 namespace UI_Brewer.Model
@@ -15,7 +16,8 @@ namespace UI_Brewer.Model
     {
 
         #region Vars
-        private static double setTemp;
+        
+        private static List<double> setTemp;
         private static double curTemp = 0;
         private static double p;
         private static double i;
@@ -86,7 +88,8 @@ namespace UI_Brewer.Model
 
             userSetPower = false;
 
-            setTemp = 0;
+            setTemp = new List<double>();
+            
             curTemp = 0;
 
             timer = new DispatcherTimer();
@@ -314,7 +317,7 @@ namespace UI_Brewer.Model
             if (BrewingTimer.StillCounting())
             {
                 // error
-                var error = setTemp - curTemp;
+                var error = setTemp[MainPage.index] - curTemp;
 
                 if (!userSetPower)
                 {
@@ -336,7 +339,7 @@ namespace UI_Brewer.Model
                 //var tempDiff = 20 - curTemp;
                 //curTemp += (dTemp + (0.2 * tempDiff));
                 //curTemp = Math.Min(Math.Max(curTemp, 0), 102);
-                if (setTemp - curTemp < 1)
+                if (setTemp[MainPage.index] - curTemp < 1)
                 {
                     ready = true;
                 }
@@ -367,9 +370,16 @@ namespace UI_Brewer.Model
                 Brewer.u = u;
             }
         }
-        public void setSetTemp(int sTemp)
+        public static void setSetTemp()
         {
-            setTemp = sTemp;
+            for (int i = 0; i < MainPage.mashDetails.Count; i++)
+            {
+                setTemp.Add(MainPage.mashDetails[i].SetTemp);
+            }
+        }
+        public double getSetTemp()
+        {
+            return setTemp[MainPage.index];
         }
         public static bool tempReached()
         {
